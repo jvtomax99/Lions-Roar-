@@ -97,7 +97,6 @@ a{color:inherit}
 .hero .stencil{position:absolute;z-index:-3;left:clamp(20px,3.6vw,56px);top:96px;font-family:var(--head);text-transform:uppercase;font-size:clamp(34px,3.6vw,52px);line-height:1;color:#2A2320;transform:rotate(3deg);opacity:.9}
 .hero .photo{position:absolute;z-index:-2;top:0;right:0;bottom:0;width:66%;background-size:cover;background-position:60% 30%;filter:grayscale(.35) sepia(.35) contrast(1.2) brightness(.62);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 28%);mask-image:linear-gradient(90deg,transparent 0,#000 28%)}
 .hero .photo.img-hero img{display:block;width:100%;height:100%;object-fit:contain;object-position:83% 0}
-.hero .photo.img-hero{filter:none} /* the black-and-gold grade is baked into kru-hero-gold.webp */
 .hero .photo.img-hero{padding-top:72px;-webkit-mask-image:linear-gradient(90deg,transparent 30%,#000 46%,#000 84%,transparent 95%);mask-image:linear-gradient(90deg,transparent 30%,#000 46%,#000 84%,transparent 95%)}
 /* wide screens: the portrait is the centerpiece, sized to the photo and faded on both sides */
 @media (min-width:1181px){
@@ -580,7 +579,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   .hero .photo{position:relative;z-index:0;width:100%;height:62vh;min-height:420px;order:-1;background-position:62% 30%;-webkit-mask-image:none;mask-image:none}
   .hero .photo.img-hero{-webkit-mask-image:none;mask-image:none}
   .hero .photo.img-hero img{object-fit:cover;object-position:50% 0}
-  .hero .shade{background:linear-gradient(180deg,rgba(11,11,11,.55) 0%,rgba(11,11,11,0) 16%,rgba(11,11,11,0) 42%,rgba(13,12,12,1) 60%)}
+  .hero .shade{background:linear-gradient(180deg,rgba(11,11,11,.55) 0,rgba(11,11,11,0) 150px,rgba(11,11,11,0) calc(max(420px,62vh) + 10px),rgba(13,12,12,1) calc(max(420px,62vh) + 72px))}
   .hero .stencil{display:none}
   .hero-body{padding-top:0;margin-top:-120px}
   .lion{top:calc(max(420px,62vh) - 252px);right:0;width:150px}
@@ -648,8 +647,9 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   .nav .menu{flex:none}
   .nav .lang-nav button{min-height:44px}
   .matt-play{font-size:13px}
-  /* Phone hero: the headline sits over the lower part of Kru's photo; fade that part out so the words sit on the dark background */
-  .hero .photo.img-hero img{-webkit-mask-image:linear-gradient(180deg,#000 40%,rgba(0,0,0,.45) 56%,rgba(0,0,0,.12) 70%,transparent 86%);mask-image:linear-gradient(180deg,#000 40%,rgba(0,0,0,.45) 56%,rgba(0,0,0,.12) 70%,transparent 86%)}
+  /* Phone hero: show the whole photo, trophies included, and start the headline just below them */
+  .hero-body{margin-top:-6px}
+  .hero .photo.img-hero img{-webkit-mask-image:linear-gradient(180deg,#000 88%,transparent 100%);mask-image:linear-gradient(180deg,#000 88%,transparent 100%)}
 }
 @media (max-width:360px){.nav{gap:8px}.nav .lang-nav button{min-width:36px}}
 </style>
@@ -685,7 +685,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
 <section class="hero" id="top">
   <div class="wall" aria-hidden="true"></div>
   <div class="stencil" aria-hidden="true">Discipline<br>builds<br>freedom</div>
-  <div class="photo img-hero"><img src="img/kru-hero-gold.webp" width="880" height="1198" fetchpriority="high" decoding="async" alt="A young Kru William Rivera in Muay Thai shorts, hands on his hips, lit in black and gold"></div>
+  <div class="photo img-hero"><img src="img/kru-trophies.webp" width="880" height="1198" fetchpriority="high" decoding="async" alt="A young Kru William Rivera in white Muay Thai shorts, standing behind his trophies"></div>
   <div class="shade" aria-hidden="true"></div>
   <svg class="grain" aria-hidden="true"><rect width="100%" height="100%" filter="url(#g)"/></svg>
 
@@ -1237,7 +1237,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
     var sb=$('stickyBook');if(!sb||!('IntersectionObserver' in window))return;
     var pastHero=false,blockers=0,seen=new Set();
     function upd(){sb.classList.toggle('show',pastHero&&blockers===0&&!document.getElementById('drawer').classList.contains('open'));}
-    new IntersectionObserver(function(es){pastHero=!es[0].isIntersecting;upd();}).observe(document.querySelector('.hero .ctas'));
+    new IntersectionObserver(function(es){pastHero=!es[0].isIntersecting&&es[0].boundingClientRect.top<0;upd();}).observe(document.querySelector('.hero .ctas'));
     var bo=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)seen.add(e.target);else seen.delete(e.target);});blockers=seen.size;upd();});
     ['#find .ctas','#join','.foot-mark','footer'].forEach(function(q){var el=document.querySelector(q);if(el)bo.observe(el);});
     new MutationObserver(upd).observe(document.getElementById('drawer'),{attributes:true,attributeFilter:['class']});

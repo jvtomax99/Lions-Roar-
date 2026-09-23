@@ -239,7 +239,7 @@ window.LR_ES={
 "Main": "Principal",
 "About the gym": "Sobre el gimnasio",
 "Pick a day": "Elige un día",
-"A young Kru William Rivera in Muay Thai shorts, hands on his hips, lit in black and gold": "Kru William Rivera de joven con pantalones de Muay Thai, manos en la cintura, en negro y dorado",
+"A young Kru William Rivera in white Muay Thai shorts, standing behind his trophies": "Kru William Rivera de joven con pantalones de Muay Thai blancos, de pie detrás de sus trofeos",
 "A young Kru William Rivera in gloves, smiling in a Thai training ring": "Kru William Rivera de joven con guantes, sonriendo en un ring de entrenamiento en Tailandia",
 "A young Kru William Rivera throwing a high kick": "Kru William Rivera de joven lanzando una patada alta",
 "A young Kru William Rivera in Muay Thai shorts, standing behind a row of trophies": "Kru William Rivera de joven con pantalones de Muay Thai, de pie detrás de una fila de trofeos",
