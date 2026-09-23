@@ -149,7 +149,8 @@ a{color:inherit}
 .screen.live .rec{display:inline-flex}
 @keyframes blink{50%{opacity:.25}}
 .film .stack{writing-mode:horizontal-tb;padding-top:4px}
-.reels{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:28px}
+.reels{display:flex;gap:14px;margin-top:28px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px;scrollbar-width:thin;scrollbar-color:var(--yellow) transparent}
+.reels .reel{flex:0 0 clamp(200px,18vw,250px);scroll-snap-align:start}
 .reel .dur{position:absolute;z-index:1;right:8px;bottom:8px;background:rgba(11,11,11,.8);color:#fff;padding:3px 7px;font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.1em}
 .reel span.t-fight{color:var(--yellow-hi)}
 .reel span.t-train{color:var(--cream)}
@@ -997,7 +998,9 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   // kind: 'fight' or 'train'. Local clips have a full video (src), a silent 8s highlight (loop) and a still (poster).
   var reels=[
     {kind:'fight',tag:'Fight night',title:'Rumble in the Bronx',cap:'Twenty matchups in one night, filmed ringside. The vibe was crazy.',dur:'1:02',src:'video/rumble-in-the-bronx.mp4',loop:'video/rumble-in-the-bronx-loop.mp4',poster:'video/rumble-in-the-bronx.webp'},
+    {kind:'fight',tag:'Fight night',title:'Warriors Cup: Ortiz vs. Mendez',cap:'Round 2 of a Warriors Cup bout, ending in a knockdown. Footage: Warriors Cup.',dur:'0:39',src:'video/warriors-cup.mp4',loop:'video/warriors-cup-loop.mp4',poster:'video/warriors-cup.webp'},
     {kind:'train',tag:'Training',title:'Pad day',cap:'The whole class on the pads, round after round, on the Lion’s Roar mats.',dur:'0:35',src:'video/pad-day.mp4',loop:'video/pad-day-loop.mp4',poster:'video/pad-day.webp'},
+    {kind:'train',tag:'Training',title:'Shadow work',cap:'Footwork, kicks and combinations, alone in the ring.',dur:'0:16',src:'video/shadow-work.mp4',loop:'video/shadow-work-loop.mp4',poster:'video/shadow-work.webp',tall:true},
     {kind:'fight',tag:'Fight night',title:'Muay Thai Madness 14',cap:'Witness this great battle. Footage: MoVision TV.',dur:'1:06',src:'video/muay-thai-madness-14.mp4',loop:'video/muay-thai-madness-14-loop.mp4',poster:'video/muay-thai-madness-14.webp',tall:true},
     {kind:'train',tag:'Training',title:'Pads with Kru William',cap:'Kru William on the pads with a student. Real footage from the Lion’s Roar archive.',yt:'Eb33qzz8lNo'},
     {kind:'fight',tag:'Instagram',title:'Fight nights & training',cap:'Thousands of posts of training, belts and fight nights on @lionsroarnyc.',ig:true}
@@ -1007,7 +1010,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   function $(id){return document.getElementById(id);}
   function paint(el,r){
     var img=r.poster?r.poster:r.yt?'https://i.ytimg.com/vi/'+r.yt+'/hqdefault.jpg':null;
-    el.style.backgroundImage=img?'url('+img+')':'none';el.style.backgroundSize='cover';el.style.backgroundPosition='center';el.style.backgroundColor=img?'#111':'#FFCC00';
+    el.style.backgroundImage=img?'url('+img+')':'none';el.style.backgroundSize='cover';el.style.backgroundPosition=r.tall?'50% 22%':'center';el.style.backgroundColor=img?'#111':'#FFCC00';
   }
   function runLoop(){
     var v=$('sLoop'),r=reels[cur];if(!v)return;

@@ -257,5 +257,9 @@ window.LR_ES={
 "by appointment": "con cita",
 "Kids ITF": "Niños ITF",
 "TITLE": "Lion’s Roar Muay Thai | Casa de Campeones | Bronx, NY",
-"DESC": "Muay Thai, boxeo, Tae Kwon Do y Jiu-Jitsu tradicionales en el Bronx con Kru William Rivera. Niños, jóvenes y adultos. 80 W Kingsbridge Rd."
+"DESC": "Muay Thai, boxeo, Tae Kwon Do y Jiu-Jitsu tradicionales en el Bronx con Kru William Rivera. Niños, jóvenes y adultos. 80 W Kingsbridge Rd.",
+"Warriors Cup: Ortiz vs. Mendez": "Warriors Cup: Ortiz vs. Mendez",
+"Round 2 of a Warriors Cup bout, ending in a knockdown. Footage: Warriors Cup.": "Segundo round de una pelea de Warriors Cup que termina con una caída. Video: Warriors Cup.",
+"Shadow work": "Sombra",
+"Footwork, kicks and combinations, alone in the ring.": "Juego de pies, patadas y combinaciones, solo en el ring."
 };
