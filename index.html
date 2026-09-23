@@ -83,7 +83,7 @@ a{color:inherit}
 .hero .ctas{display:flex;gap:18px;flex-wrap:wrap;margin-top:34px}
 .lion{position:absolute;z-index:0;right:clamp(0px,1.6vw,28px);top:78px;width:clamp(190px,18vw,290px);aspect-ratio:1;pointer-events:none}
 .lion .lion-art{position:relative;z-index:1;display:block;width:100%;height:100%;filter:drop-shadow(0 0 16px rgba(255,120,0,.45))}
-.lion .fire{position:absolute;z-index:0;left:-34%;width:168%;bottom:8%;height:150%;filter:blur(.8px) saturate(1.3) contrast(1.15);-webkit-mask-image:radial-gradient(ellipse 50% 66% at 50% 60%,#000 46%,transparent 100%),linear-gradient(0deg,transparent 0,#000 14%);-webkit-mask-composite:source-in;mask-image:radial-gradient(ellipse 50% 66% at 50% 60%,#000 46%,transparent 100%),linear-gradient(0deg,transparent 0,#000 14%);mask-composite:intersect}
+.lion .fire{position:absolute;z-index:0;left:-34%;width:168%;bottom:8%;height:150%;-webkit-mask-image:radial-gradient(ellipse 50% 66% at 50% 60%,#000 46%,transparent 100%),linear-gradient(0deg,transparent 0,#000 14%);-webkit-mask-composite:source-in;mask-image:radial-gradient(ellipse 50% 66% at 50% 60%,#000 46%,transparent 100%),linear-gradient(0deg,transparent 0,#000 14%);mask-composite:intersect}
 .glass{position:absolute;right:clamp(20px,3.6vw,56px);bottom:74px;width:212px;padding:22px 22px 20px;border-radius:12px;background:rgba(12,12,12,.62);border:1px solid rgba(243,235,221,.22);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .glass b{display:block;font-family:var(--head);font-weight:400;font-size:46px;line-height:1;color:var(--yellow)}
 .glass .cap{display:block;margin-top:8px;padding-bottom:16px;border-bottom:1px solid rgba(243,235,221,.2);font-family:var(--cond);font-weight:600;font-size:14px;letter-spacing:.14em;text-transform:uppercase}
@@ -432,7 +432,7 @@ footer a:hover{color:var(--yellow)}
     <button type="button" class="menu" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="drawer"><svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><path d="M1 2H21M1 8H21M8 14H21" stroke="currentColor"stroke-width="2" stroke-linecap="round"/></svg></button>
   </nav>
 
-  <div class="lion" aria-hidden="true"><canvas class="fire" id="fire" width="64" height="80"></canvas><img class="lion-art" id="lionArt" src="img/lion-still.webp" width="400" height="400" alt="" decoding="async" fetchpriority="high"></div>
+  <div class="lion" aria-hidden="true"><canvas class="fire" id="fire"></canvas><img class="lion-art" id="lionArt" src="img/lion-still.webp" width="400" height="400" alt="" decoding="async" fetchpriority="high"></div>
 
   <div class="hero-body wrap">
     <div class="hero-copy">
@@ -771,29 +771,37 @@ footer a:hover{color:var(--yellow)}
   function lionAnim(){var a=new Image();a.onload=function(){$('lionArt').src=a.src;};a.src='img/lion-anim.webp';}
   if(!calm){if(document.readyState==='complete'){lionAnim();}else{window.addEventListener('load',lionAnim);}}
 
-  // Wild fire behind the lion: heat rises through a small grid, cools and drifts with random gusts,
-  // then the canvas is scaled up and blurred. Pauses off screen; one still frame for reduced motion.
+  // Wild fire behind the lion: soft glowing embers rise, sway and cool from white-yellow to red,
+  // blended additively so overlaps build into flame tongues. Drawn at full screen sharpness;
+  // pauses off screen or in a background tab; a single still frame with reduced motion.
   var fc=$('fire');
   if(fc&&fc.getContext){
-    var FW=64,FH=80,MAX=36,fx=fc.getContext('2d'),fimg=fx.createImageData(FW,FH),heat=new Uint8Array(FW*FH),pal=[],wind=0;
-    var stops=[[0,0,0,0,0],[4,90,10,0,0],[9,155,26,0,.55],[15,225,72,0,.84],[21,255,128,0,.94],[27,255,192,0,.98],[32,255,216,44,1],[36,255,246,190,1]];
-    for(var v=0;v<=MAX;v++){for(var k=1;v>stops[k][0];k++){}var A=stops[k-1],B=stops[k],t=(v-A[0])/(B[0]-A[0]);pal.push([0,1,2,3].map(function(c){return A[c+1]+(B[c+1]-A[c+1])*t;}));}
-    function seed(){for(var x=0;x<FW;x++){var d=Math.abs(x-FW/2)/(FW/2),h=d<.62?MAX:(d<.82?MAX-12:0);if(h&&Math.random()<.18)h=Math.max(0,h-((Math.random()*20)|0));heat[(FH-1)*FW+x]=h;}}
-    function burn(){
-      wind=Math.max(-1.6,Math.min(1.6,wind*.97+(Math.random()-.5)*.6));var w=Math.round(wind);
-      for(var x=0;x<FW;x++)for(var y=1;y<FH;y++){var i=y*FW+x,h=heat[i];
-        if(!h){heat[i-FW]=0;continue;}
-        var r=(Math.random()*3)|0,d=i-FW-r+1+w,cool=(Math.random()<.42?1:0)+(Math.random()<.06?1:0);if(d>=0&&d<FW*FH)heat[d]=Math.max(0,h-cool);}
-    }
-    function paint(){var o=fimg.data;for(var i=0;i<heat.length;i++){var c=pal[heat[i]],j=i*4;o[j]=c[0];o[j+1]=c[1];o[j+2]=c[2];o[j+3]=c[3]*255;}fx.putImageData(fimg,0,0);}
-    for(var n=0;n<FH*2;n++){seed();burn();}paint();
+    var fx=fc.getContext('2d'),W=0,H=0,dpr=1,parts=[],sprites=[],STEPS=32;
+    (function(){var cols=[[255,214,110],[255,176,40],[255,132,12],[240,90,0],[205,50,0],[140,22,0],[70,8,0]];
+      for(var i=0;i<STEPS;i++){var t=i/(STEPS-1)*(cols.length-1),k=Math.min(cols.length-2,Math.floor(t)),f=t-k,c=[0,1,2].map(function(j){return Math.round(cols[k][j]+(cols[k+1][j]-cols[k][j])*f);});
+        var sc=document.createElement('canvas');sc.width=sc.height=64;var g=sc.getContext('2d'),gr=g.createRadialGradient(32,32,0,32,32,32);
+        gr.addColorStop(0,'rgba('+c+',1)');gr.addColorStop(.35,'rgba('+c+',.55)');gr.addColorStop(1,'rgba('+c+',0)');g.fillStyle=gr;g.fillRect(0,0,64,64);sprites.push(sc);}})();
+    function size(){var r=fc.getBoundingClientRect();dpr=Math.min(window.devicePixelRatio||1,2);W=Math.max(1,Math.round(r.width*dpr));H=Math.max(1,Math.round(r.height*dpr));fc.width=W;fc.height=H;}
+    function spawn(){var u=Math.random()*2-1,edge=Math.abs(u);u*=Math.sqrt(edge)/Math.max(edge,1e-3);
+      parts.push({x:W*(.5+u*.34),y:H*(.62+Math.random()*.22+edge*.08),vx:(Math.random()-.5)*.3*dpr+u*.25*dpr,vy:-(2.2+Math.random()*2.4)*(1.15-edge*.5)*H/400,
+        r:(7+Math.random()*10)*(1.1-edge*.45)*W/300,life:0,max:.8+Math.random()*.9-edge*.35,ph:Math.random()*6.28,sw:.3+Math.random()*.9});}
+    function step(){var n=11+(Math.random()<.5?1:0);for(var i=0;i<n;i++)spawn();
+      for(var j=parts.length-1;j>=0;j--){var p=parts[j];p.life+=1/60/p.max;if(p.life>=1){parts.splice(j,1);continue;}
+        p.ph+=.09;p.x+=p.vx+Math.sin(p.ph)*p.sw*W/400;p.y+=p.vy;p.vy*=.997;p.vx*=.99;}}
+    function draw(){fx.globalCompositeOperation='source-over';fx.clearRect(0,0,W,H);fx.globalCompositeOperation='lighter';
+      for(var j=0;j<parts.length;j++){var p=parts[j],l=p.life,rad=p.r*(l<.25?.7+l*1.2:1.15-(l-.25)*.95);
+        fx.globalAlpha=Math.min(1,l*8)*Math.pow(1-l,1.3)*.36;fx.drawImage(sprites[Math.min(STEPS-1,(l*STEPS)|0)],p.x-rad,p.y-rad,rad*2,rad*2);}
+      fx.globalAlpha=1;}
+    size();for(var w=0;w<90;w++)step();draw();
+    window.addEventListener('resize',function(){var oW=W,oH=H;size();parts.forEach(function(p){p.x*=W/oW;p.y*=H/oH;});draw();});
     if(!calm){
       var fOn=true,last=0;
-      function tick(ts){if(fOn&&!document.hidden&&ts-last>33){last=ts;seed();burn();paint();}requestAnimationFrame(tick);}
+      function tick(ts){if(fOn&&!document.hidden&&ts-last>15){last=ts;step();draw();}requestAnimationFrame(tick);}
       requestAnimationFrame(tick);
       if('IntersectionObserver' in window){new IntersectionObserver(function(es){fOn=es[0].isIntersecting;}).observe(fc);}
     }
   }
+
 
   // Matthew's fight clip: silent loop while on screen; a tap restarts it with sound (full screen on phones)
   var mBox=$('mattReel'),mVid=$('mattVid'),mOn=false,mIn=false;
