@@ -106,8 +106,21 @@ a{color:inherit}
 .screen .cap b{display:block;font-family:var(--head);font-weight:400;font-size:clamp(28px,2.8vw,40px);line-height:1;text-transform:uppercase}
 .screen .cap small{display:block;margin-top:8px;max-width:520px;font-size:15px;line-height:1.5;color:#E1D8CA}
 .screen .cap .pill{flex-shrink:0;background:var(--red);color:#fff;padding:7px 12px;font-family:var(--cond);font-weight:600;font-size:13px;letter-spacing:.16em;text-transform:uppercase}
+.screen .pill.gold{background:var(--gold);color:var(--black)}
+.screen .backdrop{position:absolute;inset:-32px;background-size:cover;background-position:center}
+.screen .backdrop.blur{filter:blur(24px) brightness(.5) saturate(1.1)}
+.screen video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.screen video.tall{object-fit:contain}
+.screen video.full:not(.tall){background:#000}
+.screen .rec{position:absolute;left:16px;top:16px;display:none;align-items:center;gap:8px;padding:6px 10px;background:rgba(11,11,11,.62);font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#fff}
+.screen .rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--red-hi);animation:blink 1.4s ease-in-out infinite}
+.screen.live .rec{display:inline-flex}
+@keyframes blink{50%{opacity:.25}}
 .film .stack{writing-mode:horizontal-tb;padding-top:4px}
-.reels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:28px}
+.reels{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:28px}
+.reel .dur{position:absolute;z-index:1;right:8px;bottom:8px;background:rgba(11,11,11,.8);color:#fff;padding:3px 7px;font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.1em}
+.reel span.t-fight{color:var(--red-hi)}
+.reel span.t-train{color:var(--gold)}
 .reel{display:flex;flex-direction:column;gap:12px;padding:0;border:0;background:none;color:var(--cream);text-align:left;cursor:pointer;font-family:inherit}
 .reel .thumb{position:relative;aspect-ratio:4/3;background-color:#111;border:1.5px solid transparent;overflow:hidden;transition:border-color .2s}
 .reel .thumb::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.35);transition:background .2s}
@@ -312,7 +325,7 @@ footer a:hover{color:var(--gold)}
   .links,.nav .stack{display:none}
   .menu{display:flex}
   .film{grid-template-columns:1fr}.film .stack{display:none}
-  .reels{grid-template-columns:repeat(3,minmax(170px,1fr));overflow-x:auto;padding-bottom:6px}
+  .reels{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}.reel{flex:0 0 220px;scroll-snap-align:start}
   .cards{grid-template-columns:1fr 1fr}.join{grid-column:1/-1}
   .kru,.hours{grid-template-columns:1fr}
   .frame{max-width:480px}
@@ -333,6 +346,7 @@ footer a:hover{color:var(--gold)}
   .fact{padding:16px 0}
   .hero .ctas .btn{flex:1 1 100%}
   .screen{aspect-ratio:4/5}.screen .play{top:40%}
+  .screen .cap{left:18px;right:18px;bottom:18px;flex-direction:column-reverse;align-items:flex-start;gap:12px}
   .reels{display:flex;scroll-snap-type:x mandatory}.reel{flex:0 0 200px;scroll-snap-align:start}
   .cards{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin-inline:calc(-1*clamp(20px,3.6vw,56px));padding-inline:clamp(20px,3.6vw,56px)}
   .card{flex:0 0 300px;scroll-snap-align:start}
@@ -490,11 +504,14 @@ footer a:hover{color:var(--gold)}
     <div class="intro">
       <span class="kicker">ROUND 01 · FIGHT FILM</span>
       <h2 class="h2">Inside the<br><span class="r">fight room.</span></h2>
-      <p>Pad rounds, sparring and fight nights, filmed on the gym floor on Kingsbridge Road. Pick a reel below.</p>
+      <p>Fight nights and training days from the Lion’s Roar camp. Pick a reel below, then tap play for the full video with sound.</p>
       <a class="more" href="https://www.instagram.com/lionsroarnyc/">More on Instagram <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M1 6H16M11 1L16 6L11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     </div>
     <div class="screen" id="screen">
+      <div class="backdrop" id="sBack" aria-hidden="true"></div>
+      <video class="loop" id="sLoop" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
       <div class="veil" aria-hidden="true"></div>
+      <span class="rec" aria-hidden="true">Highlight</span>
       <svg class="grain" aria-hidden="true"><rect width="100%" height="100%" filter="url(#g)"/></svg>
       <button class="play" id="play" aria-label="Play video"><svg width="26" height="30" viewBox="0 0 26 30" aria-hidden="true"><path d="M3 2L24 15L3 28Z" fill="#fff"/></svg></button>
       <div class="cap"><div><b id="sTitle"></b><small id="sCap"></small></div><span class="pill" id="sTag"></span></div>
@@ -634,44 +651,78 @@ footer a:hover{color:var(--gold)}
     b.querySelector('.play').addEventListener('click',function(){embed(b,b.getAttribute('data-yt'))});
   });
 
+  // kind: 'fight' or 'train'. Local clips have a full video (src), a silent 8s highlight (loop) and a still (poster).
   var reels=[
-    {tag:'Pad work',title:'Pads with Kru William',cap:'Kru William on the pads with a student. Real footage from the Lion’s Roar archive.',yt:'Eb33qzz8lNo'},
-    {tag:'The ritual',title:'The Wai Kru',cap:'Kru William performs the Wai Kru, the dance that honors teacher and lineage.',yt:'bVGRNPLtqdE'},
-    {tag:'Instagram',title:'Fight nights & training',cap:'Thousands of posts of training, belts and fight nights on @lionsroarnyc.',ig:true}
+    {kind:'fight',tag:'Fight night',title:'Rumble in the Bronx',cap:'Twenty matchups in one night, filmed ringside. The vibe was crazy.',dur:'1:02',src:'video/rumble-in-the-bronx.mp4',loop:'video/rumble-in-the-bronx-loop.mp4',poster:'video/rumble-in-the-bronx.webp'},
+    {kind:'train',tag:'Training',title:'Pad day',cap:'The whole class on the pads, round after round, on the Lion’s Roar mats.',dur:'0:35',src:'video/pad-day.mp4',loop:'video/pad-day-loop.mp4',poster:'video/pad-day.webp'},
+    {kind:'fight',tag:'Fight night',title:'Muay Thai Madness 14',cap:'Witness this great battle. Footage: MoVision TV.',dur:'1:06',src:'video/muay-thai-madness-14.mp4',loop:'video/muay-thai-madness-14-loop.mp4',poster:'video/muay-thai-madness-14.webp',tall:true},
+    {kind:'train',tag:'Training',title:'Pads with Kru William',cap:'Kru William on the pads with a student. Real footage from the Lion’s Roar archive.',yt:'Eb33qzz8lNo'},
+    {kind:'fight',tag:'Instagram',title:'Fight nights & training',cap:'Thousands of posts of training, belts and fight nights on @lionsroarnyc.',ig:true}
   ];
-  var screen=document.getElementById('screen'),box=document.getElementById('reels'),cur=0;
+  var screen=document.getElementById('screen'),box=document.getElementById('reels'),cur=0,inView=false;
+  var calm=window.matchMedia('(prefers-reduced-motion: reduce)').matches||!!(navigator.connection&&navigator.connection.saveData);
+  function $(id){return document.getElementById(id);}
   function paint(el,r){
-    if(r.yt){el.style.backgroundImage='url(https://i.ytimg.com/vi/'+r.yt+'/hqdefault.jpg)';el.style.backgroundSize='cover';el.style.backgroundPosition='center';el.style.backgroundColor='#111';}
-    else{el.style.backgroundImage='none';el.style.backgroundColor='#D71920';}
+    var img=r.poster?r.poster:r.yt?'https://i.ytimg.com/vi/'+r.yt+'/hqdefault.jpg':null;
+    el.style.backgroundImage=img?'url('+img+')':'none';el.style.backgroundSize='cover';el.style.backgroundPosition='center';el.style.backgroundColor=img?'#111':'#D71920';
+  }
+  function runLoop(){
+    var v=$('sLoop'),r=reels[cur];if(!v)return;
+    if(r.loop&&inView&&!calm){var p=v.play();if(p&&p.catch)p.catch(function(){});}else{v.pause();}
   }
   var original=screen.innerHTML;
   function pick(i){
     cur=i;var r=reels[i];
-    if(!screen.querySelector('#play')){screen.innerHTML=original;bindPlay();}
-    paint(screen,r);
-    document.getElementById('sTitle').textContent=r.title;
-    document.getElementById('sCap').textContent=r.cap;
-    document.getElementById('sTag').textContent=r.yt?r.tag+' · Watch':r.tag;
-    document.getElementById('play').setAttribute('aria-label','Play '+r.title);
+    if(!$('play')){screen.innerHTML=original;bindPlay();}
+    var v=$('sLoop'),back=$('sBack');
+    screen.classList.remove('live');
+    if(r.src){
+      screen.style.backgroundImage='none';screen.style.backgroundColor='#111';
+      back.style.backgroundImage='url('+r.poster+')';back.className='backdrop'+(r.tall?' blur':'');
+      v.className='loop'+(r.tall?' tall':'');v.hidden=false;v.poster=r.poster;
+      if(v.getAttribute('src')!==r.loop){v.setAttribute('src',r.loop);}
+    }else{
+      paint(screen,r);back.style.backgroundImage='none';v.pause();v.removeAttribute('src');v.hidden=true;
+    }
+    $('sTitle').textContent=r.title;
+    $('sCap').textContent=r.cap;
+    $('sTag').textContent=r.dur?r.tag+' · '+r.dur:r.yt?r.tag+' · Watch':r.tag;
+    $('sTag').className='pill'+(r.kind==='train'?' gold':'');
+    $('play').setAttribute('aria-label',(r.ig?'Open ':'Play ')+r.title+(r.dur?' ('+r.dur+')':''));
     Array.prototype.forEach.call(box.children,function(b,j){b.setAttribute('aria-pressed',j===i?'true':'false')});
+    runLoop();
+  }
+  function playFull(r){
+    var v=document.createElement('video');
+    v.className='full'+(r.tall?' tall':'');v.src=r.src;v.poster=r.poster;v.controls=true;v.playsInline=true;v.setAttribute('playsinline','');
+    v.setAttribute('aria-label',r.title);
+    screen.classList.remove('live');screen.innerHTML='';
+    if(r.tall){var b=document.createElement('div');b.className='backdrop blur';b.style.backgroundImage='url('+r.poster+')';screen.appendChild(b);}
+    screen.appendChild(v);
+    var p=v.play();if(p&&p.catch)p.catch(function(){});
   }
   function bindPlay(){
-    document.getElementById('play').addEventListener('click',function(){
+    $('play').addEventListener('click',function(){
       var r=reels[cur];
-      if(r.yt){embed(screen,r.yt);}else{window.open('https://www.instagram.com/lionsroarnyc/','_blank','noopener');}
+      if(r.src){playFull(r);}else if(r.yt){embed(screen,r.yt);}else{window.open('https://www.instagram.com/lionsroarnyc/','_blank','noopener');}
     });
+    $('sLoop').addEventListener('playing',function(){screen.classList.add('live')});
+    $('sLoop').addEventListener('pause',function(){screen.classList.remove('live')});
   }
   bindPlay();
   reels.forEach(function(r,i){
-    var b=document.createElement('button');b.type='button';b.className='reel';b.setAttribute('aria-label','Show '+r.title);
+    var b=document.createElement('button');b.type='button';b.className='reel';b.setAttribute('aria-label','Show '+r.title+(r.dur?', '+r.tag+', '+r.dur:''));
     var th=document.createElement('span');th.className='thumb';paint(th,r);
-    th.innerHTML='<span class="now">Now showing</span>';
+    th.innerHTML='<span class="now">Now showing</span>'+(r.dur?'<span class="dur">'+r.dur+'</span>':'');
     var n=document.createElement('b');n.textContent=r.title;
-    var s=document.createElement('span');s.textContent=r.tag;
+    var s=document.createElement('span');s.className='t-'+r.kind;s.textContent=r.tag;
     b.appendChild(th);b.appendChild(n);b.appendChild(s);
     b.addEventListener('click',function(){pick(i)});
     box.appendChild(b);
   });
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(es){inView=es[0].isIntersecting;runLoop();},{threshold:.35}).observe(screen);
+  }
   pick(0);
 })();
 </script>
