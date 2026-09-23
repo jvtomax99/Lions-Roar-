@@ -739,6 +739,24 @@ footer a:hover{color:var(--yellow)}
 </footer>
 
 <script>
+// Always open at the top: no jump to a remembered scroll position or to a #section left in the address by a menu tap.
+(function(){
+  if('scrollRestoration' in history)history.scrollRestoration='manual';
+  if(location.hash&&history.replaceState)history.replaceState(null,'',location.pathname+location.search);
+  var moved=false;
+  ['wheel','touchstart','keydown','mousedown'].forEach(function(ev){window.addEventListener(ev,function(){moved=true;},{passive:true,once:true});});
+  function toTop(){if(!moved)window.scrollTo({top:0,left:0,behavior:'instant'});}
+  toTop();window.addEventListener('DOMContentLoaded',toTop);window.addEventListener('load',function(){toTop();setTimeout(toTop,0);});
+  // In-page links glide to their section without writing #section into the address.
+  document.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a||e.defaultPrevented)return;
+    var id=a.getAttribute('href').slice(1),el=id?document.getElementById(id):null;
+    if(!el&&id!=='top')return;
+    e.preventDefault();
+    var calm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(id==='top'||!el)window.scrollTo({top:0,behavior:calm?'instant':'smooth'});else el.scrollIntoView({behavior:calm?'instant':'smooth',block:'start'});
+  });
+})();
 (function(){
   var drawer=document.getElementById('drawer'),menuBtn=document.getElementById('menuBtn'),closeBtn=document.getElementById('drawerClose');
   function setMenu(open,refocus){
