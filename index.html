@@ -606,17 +606,24 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
 
 /* Team band: a full-width photo break between Champions and the yellow reviews */
 .team-band{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:flex-end;min-height:clamp(480px,86vh,820px);padding-block:clamp(48px,6vw,88px);background:var(--black)}
-.team-band img{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:50% 62%;filter:grayscale(.2) contrast(1.12) brightness(.72);transition:transform 2.4s cubic-bezier(.2,.8,.2,1)}
+.team-band img{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:50% 62%;filter:contrast(1.06) brightness(1.02);transition:transform 2.4s cubic-bezier(.2,.8,.2,1)}
 .team-band.settle img{transform:scale(1.08)}
 .team-band.settle.in img{transform:none}
-.team-band::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(11,11,11,.85) 0%,rgba(11,11,11,0) 20%,rgba(11,11,11,0) 48%,rgba(11,11,11,.9) 86%,var(--black) 100%),linear-gradient(90deg,rgba(11,11,11,.55) 0%,rgba(11,11,11,0) 55%)}
+.team-band::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(11,11,11,.7) 0%,rgba(11,11,11,0) 14%,rgba(11,11,11,0) 58%,rgba(11,11,11,.82) 88%,var(--black) 100%),linear-gradient(90deg,rgba(11,11,11,.6) 0%,rgba(11,11,11,.25) 30%,rgba(11,11,11,0) 50%)}
 .team-band .grain{z-index:-1;opacity:.14;mix-blend-mode:overlay}
 .team-band .wrap{width:100%}
 .team-band .kicker{text-transform:uppercase}
 .tb-line{margin:0;font-family:var(--head);font-weight:400;text-transform:uppercase;line-height:.9;font-size:clamp(64px,8.4vw,128px);color:var(--cream)}
 .tb-line span{display:block;color:var(--yellow)}
 .tb-sub{margin:18px 0 0;max-width:520px;font-size:clamp(17px,1.4vw,20px);line-height:1.5;color:#E1D8CA}
-@media (max-width:820px){.team-band{min-height:560px}.team-band img{object-position:50% 30%}}
+/* Phones: the photo sits on top at full brightness and the words go underneath, so no one is covered */
+@media (max-width:820px){
+  .team-band{display:block;min-height:0;padding:0 0 clamp(40px,10vw,64px)}
+  .team-band img{position:relative;inset:auto;z-index:0;display:block;height:auto;aspect-ratio:1206/1000;object-position:50% 70%;-webkit-mask-image:linear-gradient(180deg,#000 82%,transparent 100%);mask-image:linear-gradient(180deg,#000 82%,transparent 100%)}
+  .team-band::after{display:none}
+  .team-band .grain{display:none}
+  .team-band .wrap{position:relative;margin-top:-28px}
+}
 @media (prefers-reduced-motion:reduce){.team-band img{transform:none;transition:none}}
 
 /* Round 04 in yellow: breaks up the run of black sections */
