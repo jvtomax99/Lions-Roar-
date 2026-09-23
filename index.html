@@ -271,7 +271,9 @@ a{color:inherit}
 .method span{display:block;margin-top:12px;font-size:16px;line-height:1.6;color:var(--muted)}
 .wall{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:clamp(56px,6vw,88px)}
 .wall .photo-slot{aspect-ratio:4/5}
-.family{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.family{margin-top:16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.family figcaption a{color:var(--yellow);text-decoration:none}
+@media (max-width:1180px) and (min-width:821px){.family{grid-template-columns:1fr 1fr}.family .photo-slot:first-child{grid-column:1/-1;aspect-ratio:16/9}}
 .family .photo-slot{aspect-ratio:4/3}
 .family .photo-slot img{object-position:50% 68%}
 .family .photo-slot.bjj-team img{object-position:50% 50%}
@@ -745,6 +747,7 @@ footer.wrap{margin-top:clamp(40px,5vw,64px)}
     <div class="family">
       <figure class="photo-slot graded"><img src="img/team.webp" width="1206" height="1081" loading="lazy" decoding="async" alt="The Lion’s Roar team lined up on the gym mats with their fists up"><figcaption>The Lion’s Roar family<small>Kids, teens and adults. One team.</small></figcaption></figure>
       <figure class="photo-slot graded bjj-team"><img src="img/bjj-team.webp" width="1206" height="1081" loading="lazy" decoding="async" alt="The Lion’s Roar Brazilian Jiu-Jitsu team in their gis on the mats"><figcaption>The Jiu-Jitsu team<small>Brazilian Jiu-Jitsu · Mon, Tue &amp; Thu, 8pm.</small></figcaption></figure>
+      <figure class="photo-slot graded boxing-team"><img src="img/boxing-team.webp" width="1206" height="809" loading="lazy" decoding="async" alt="The B Elite Boxing team in the Lion’s Roar ring under the Home of Champions banner"><figcaption>B Elite Boxing<small>The boxing team · <a href="https://www.instagram.com/b_eliteboxing/" target="_blank" rel="noopener">@b_eliteboxing</a></small></figcaption></figure>
     </div>
   </div>
 </section>
@@ -815,7 +818,7 @@ footer.wrap{margin-top:clamp(40px,5vw,64px)}
     </div>
     <div class="rows">
       <a class="row" href="#hours" data-vid="video/class-muaythai.mp4" data-img="video/class-muaythai.webp" data-cap="Mon – Fri · 1pm &amp; 6pm"><span class="t">Muay Thai</span><span class="d">The art of eight limbs: punches, elbows, knees, kicks and the clinch, taught the Thai way.</span><span class="arrow"><svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M1 6H16M11 1L16 6L11 11" fill="none" stroke="#F3EBDD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
-      <a class="row" href="#hours" data-vid="video/class-boxing.mp4" data-img="video/class-boxing.webp" data-cap="Mon – Fri · by appointment"><span class="t">Boxing</span><span class="d">Footwork, head movement and clean, sharp hands.</span><span class="arrow"><svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M1 6H16M11 1L16 6L11 11" fill="none" stroke="#F3EBDD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+      <a class="row" href="#hours" data-vid="video/class-boxing.mp4" data-img="video/class-boxing.webp" data-cap="B Elite Boxing · by appointment"><span class="t">Boxing</span><span class="d">Footwork, head movement and clean, sharp hands. Home of the B Elite Boxing team.</span><span class="arrow"><svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M1 6H16M11 1L16 6L11 11" fill="none" stroke="#F3EBDD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
       <a class="row" href="#hours" data-vid="video/class-tkd.mp4" data-img="video/class-tkd.webp" data-cap="Kids ITF · Mon · Tue · Fri · 5pm"><span class="t">Tae Kwon Do</span><span class="d">ITF Tae Kwon Do: speed, flexibility and precise kicking. A strong start for kids.</span><span class="arrow"><svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M1 6H16M11 1L16 6L11 11" fill="none" stroke="#F3EBDD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
       <a class="row" href="#hours" data-vid="video/class-bjj.mp4" data-img="video/class-bjj.webp" data-cap="Mon · Tue · Thu · 8pm"><span class="t">Jiu-Jitsu</span><span class="d">Ground control, sweeps and submissions. Leverage beats size.</span><span class="arrow"><svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M1 6H16M11 1L16 6L11 11" fill="none" stroke="#F3EBDD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
     </div>
