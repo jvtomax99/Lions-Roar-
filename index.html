@@ -41,7 +41,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;1,500&family=Sedgwick+Ave+Display&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;1,500&display=swap">
 <style>
 :root{
   --black:#0B0B0B;--coal:#141313;--line:rgba(243,235,221,.14);
@@ -686,14 +686,6 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   .hero .photo.img-hero img{-webkit-mask-image:linear-gradient(180deg,#000 88%,transparent 100%);mask-image:linear-gradient(180deg,#000 88%,transparent 100%)}
 }
 @media (max-width:360px){.nav{gap:8px}.nav .lang-nav button{min-width:36px}}
-/* Graffiti: spray-painted Bronx / Nuyorican tags that spray on as you scroll */
-#film,#champions,#reviews,#classes,#hours,#find{position:relative}
-.grf{position:absolute;z-index:4;display:block;width:var(--w,clamp(170px,23vw,340px));transform:rotate(var(--r,0deg));pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
-.grf svg{display:block;width:100%;height:auto;overflow:visible}
-.rv.grf:not(.in){opacity:1;translate:none;clip-path:inset(-20% 100% -40% -10%)}
-.rv.grf{transition:clip-path 1.2s cubic-bezier(.65,0,.35,1) .15s;clip-path:inset(-20% -10% -40% -10%)}
-@media (max-width:820px){.grf{width:var(--w,clamp(120px,36vw,190px));opacity:.95}}
-@media (prefers-reduced-motion:reduce){.rv.grf,.rv.grf:not(.in){clip-path:none!important}}
 </style>
 </head>
 <body>
@@ -776,7 +768,6 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
 </div>
 
 <section class="kru-feature" id="kru">
-  <span class="grf rv" aria-hidden="true" data-g="Boogie Down" data-c="gold" style="--r:-7deg;top:clamp(18px,3vw,44px);right:3%"></span>
   <div class="wrap">
     <div class="kf-top">
       <div>
@@ -841,7 +832,6 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
 </section>
 
 <section class="section wrap" id="film">
-  <span class="grf rv" aria-hidden="true" data-g="¡Wepa!" data-c="pink" style="--r:5deg;top:clamp(14px,2.5vw,40px);right:2%"></span>
   <div class="film">
     <div class="intro">
       <span class="kicker">ROUND 02 · FIGHT FILM</span>
@@ -864,7 +854,6 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
 </section>
 
 <section class="champs" id="champions">
-  <span class="grf rv" aria-hidden="true" data-g="Home of Champs" data-c="crown" style="--r:-5deg;top:clamp(18px,3vw,48px);right:3%"></span>
   <div class="wrap">
     <div class="head">
       <div><span class="kicker">ROUND 03 · CHAMPIONS</span><h2 class="h2">Home of <span class="r">champions.</span></h2></div>
@@ -898,7 +887,6 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
 </section>
 
 <section class="reviews" id="reviews">
-  <span class="grf rv" aria-hidden="true" data-g="Familia" data-c="red" style="--r:6deg;bottom:clamp(14px,3vw,40px);right:3%"></span>
   <div class="wrap">
     <div class="rv-head">
       <div><span class="kicker">ROUND 04 · THE FAMILY</span><h2 class="h2">Don’t take<br>our <span class="r">word.</span></h2></div>
@@ -925,7 +913,6 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
 </div>
 
 <section class="matt" id="matthew">
-  <span class="grf rv" aria-hidden="true" data-g="Pa'lante" data-c="blue" style="--r:-6deg;top:clamp(6px,1.2vw,18px);right:2%"></span>
   <span class="matt-bg" aria-hidden="true">Rivera</span>
   <div class="wrap matt-grid">
     <div class="matt-media">
@@ -958,7 +945,6 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
 
 
 <section class="section classes" id="classes">
-  <span class="grf rv" aria-hidden="true" data-g="Boricua" data-c="flag" style="--r:-4deg;top:clamp(14px,2.5vw,40px);right:2%"></span>
   <div class="wrap">
     <div class="head">
       <div><span class="kicker">ROUND 06 · CLASSES</span><h2 class="h2">Pick your <span class="r">weapon.</span></h2></div>
@@ -975,7 +961,6 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
 </section>
 
 <section class="section wrap" id="hours">
-  <span class="grf rv" aria-hidden="true" data-g="BX" data-c="chrome" style="--r:-8deg;top:clamp(10px,2vw,30px);right:3%;--w:clamp(120px,14vw,210px)"></span>
   <div class="hours">
     <div><span class="kicker">ROUND 07 · HOURS</span><h2 class="h2">Doors <span class="r">open.</span></h2><p class="note">Full weekly class schedule below. Questions? Call or text <a href="tel:+13479281764">347-928-1764</a> or DM <a href="https://www.instagram.com/lionsroarnyc/" target="_blank" rel="noopener">@lionsroarnyc</a>.</p>
       <div class="price"><span class="lbl">Membership</span><b>$250<small>/ month</small></b><a class="btn btn-red" href="tel:+13479281764">Call to sign up <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M1 6H16M11 1L16 6L11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></div>
@@ -1002,7 +987,6 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
 </section>
 
 <section class="section wrap" id="find">
-  <span class="grf rv" aria-hidden="true" data-g="Kingsbridge" data-c="green" style="--r:4deg;top:clamp(0px,.6vw,10px);right:2%"></span>
   <div class="findus">
     <div class="map" id="map">
       <canvas id="map3d" role="img" aria-label="Illustrated 3D map: Lion’s Roar on West Kingsbridge Road, across from the Kingsbridge Armory, a short walk from the 4 train at Jerome Avenue"></canvas>
@@ -1031,7 +1015,6 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
 </section>
 
 <section class="section final" id="join">
-  <span class="grf rv" aria-hidden="true" data-g="¡Dale!" data-c="black" style="--r:-6deg;top:clamp(18px,3vw,44px);right:4%;--w:clamp(130px,16vw,240px)"></span>
   <div class="bg img-heroreal" aria-hidden="true"></div>
   <img class="stamp" src="img/crest.webp" alt="" aria-hidden="true">
   <svg class="grain" aria-hidden="true"><rect width="100%" height="100%" filter="url(#g)"/></svg>
@@ -1135,30 +1118,6 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   var screen=document.getElementById('screen'),box=document.getElementById('reels'),cur=0,inView=false;
   var calm=window.matchMedia('(prefers-reduced-motion: reduce)').matches||!!(navigator.connection&&navigator.connection.saveData);
   function $(id){return document.getElementById(id);}
-
-  // Graffiti tags: built as SVG from each placeholder's text and colour scheme
-  (function(){var PAL={gold:['#FFE680','#FFB000','#0b0b0b','#fff'],pink:['#ffe14d','#ff4fa0','#0b0b0b','#fff'],crown:['#ffffff','#FFCC00','#0b0b0b','#FFCC00'],
-      red:['#ff6a5a','#c8102e','#0b0b0b','#fff'],blue:['#7fe3ff','#1b5fc9','#0b0b0b','#fff'],flag:['#e4202e','#e4202e','#0b0b0b','#fff'],chrome:['#ffffff','#9aa3b2','#0b0b0b','#5ff4ff'],
-      green:['#b6ff6a','#1f9a4a','#0b0b0b','#fff'],black:['#2a2a2a','#0b0b0b','#c8102e','#fff']},n=0;
-    document.querySelectorAll('.grf[data-g]').forEach(function(el){var t=el.getAttribute('data-g'),k=el.getAttribute('data-c')||'gold',p=PAL[k]||PAL.gold,id='g'+(n++),W=600,Hh=210,fs=t.length<4?170:t.length<8?128:96,
-      r=(function(s){return function(){s=(s*16807)%2147483647;return (s-1)/2147483646;};})(t.length*97+n*13),i,drips='',spl='',x;
-      var fill=k==='flag'?'url(#'+id+'s)':'url(#'+id+'f)';
-      for(i=0;i<7;i++){x=50+r()*500;var dl=18+r()*42;drips+='<rect x="'+(x-4).toFixed(1)+'" y="138" width="8" height="'+dl.toFixed(1)+'" rx="4" fill="'+(k==='flag'?'#e4202e':p[1])+'"/><circle cx="'+x.toFixed(1)+'" cy="'+(138+dl).toFixed(1)+'" r="6.5" fill="'+(k==='flag'?'#e4202e':p[1])+'"/>';}
-      for(i=0;i<16;i++)spl+='<circle cx="'+(r()*W).toFixed(1)+'" cy="'+(r()*Hh).toFixed(1)+'" r="'+(1.5+r()*4.5).toFixed(1)+'" fill="'+[p[1],p[3],p[0]][i%3]+'" opacity=".8"/>';
-      var txt='x="300" y="130" text-anchor="middle" textLength="560" lengthAdjust="spacingAndGlyphs" font-family="Sedgwick Ave Display,Permanent Marker,cursive" font-size="'+fs+'"';
-      var extra='';if(k==='crown')extra='<path d="M250 26 L262 -8 L282 16 L300 -16 L318 16 L338 -8 L350 26 Z" fill="#FFCC00" stroke="#0b0b0b" stroke-width="6" stroke-linejoin="round"/>';
-      if(k==='flag')extra='<path d="M548 30 l8 17 18 2 -13 12 4 18 -17 -9 -16 9 4 -18 -13 -12 18 -2z" fill="#fff" stroke="#0b0b0b" stroke-width="4"/>';
-      el.innerHTML='<svg viewBox="-20 -30 640 260" xmlns="http://www.w3.org/2000/svg"><defs>'+
-        '<linearGradient id="'+id+'f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+p[0]+'"/><stop offset="1" stop-color="'+p[1]+'"/></linearGradient>'+
-        '<pattern id="'+id+'s" width="600" height="36" patternUnits="userSpaceOnUse" y="40"><rect width="600" height="18" fill="#e4202e"/><rect y="18" width="600" height="18" fill="#fff"/></pattern>'+
-        '<clipPath id="'+id+'c"><text '+txt+'>'+t+'</text></clipPath></defs>'+
-        '<g opacity=".9">'+spl+'</g>'+
-        '<text '+txt+' transform="translate(9 10)" fill="#0b0b0b">'+t+'</text>'+
-        '<text '+txt+' fill="none" stroke="'+p[2]+'" stroke-width="18" stroke-linejoin="round">'+t+'</text>'+
-        '<text '+txt+' fill="none" stroke="'+p[3]+'" stroke-width="6" stroke-linejoin="round" opacity=".9">'+t+'</text>'+
-        drips+'<text '+txt+' fill="'+fill+'">'+t+'</text>'+
-        (k==='flag'?'<polygon points="40,20 40,150 150,85" fill="#1b5fc9" opacity=".9" clip-path="url(#'+id+'c)"/>':'')+
-        '<g clip-path="url(#'+id+'c)" fill="#fff" opacity=".55"><rect x="0" y="52" width="600" height="7" transform="rotate(-4 300 60)"/></g>'+extra+'</svg>';});})();
   function paint(el,r){
     var img=r.poster?r.poster:r.yt?'https://i.ytimg.com/vi/'+r.yt+'/hqdefault.jpg':null;
     el.style.backgroundImage=img?'url('+img+')':'none';el.style.backgroundSize='cover';el.style.backgroundPosition=r.tall?'50% 22%':'center';el.style.backgroundColor=img?'#111':'#FFCC00';
