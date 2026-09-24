@@ -1589,7 +1589,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
       rx=Math.cos(t);ry=-Math.sin(t);
       ux=ry*fz;uy=-rx*fz;uz=rx*fy-ry*fx;
       var D=cam.dist*span();C=[cam.tx-D*fx,cam.ty-D*fy,(cam.tz||0)-D*fz];
-      F=H/(2*Math.tan(17*Math.PI/180));}
+      F=H/(2*Math.tan(17*Math.PI/180))*(1+ZPUNCH);}
     function span(){return Math.max(1,1.45/(W/H));}
     function fightCam(){var near=1-sm((Math.hypot(cam.tx-AX,cam.ty-AY)-10)/10);return near*Math.max(0,Math.min(1,(70-cam.dist)/35));}
     function P(x,y,z){var dx=x-C[0],dy=y-C[1],dz=z-C[2],zc=dx*fx+dy*fy+dz*fz;if(zc<5)return null;
@@ -1649,18 +1649,18 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
     var DUR={jab:.42,cross:.5,hook:.56,elbow:.56,kick:1,headkick:1.1,teep:.8,knee:.85},
         IMP={jab:.33,cross:.36,hook:.42,elbow:.42,kick:.5,headkick:.5,teep:.45,knee:.52},
         REACH={jab:.98,cross:1,hook:.86,elbow:.74,kick:1.06,headkick:1.08,teep:1.08,knee:.7};
-    function attack(S,m,p){var e;
-      if(m==='jab'){e=curve(p,.33,.46);S.lw=mixv(S.lw,V(.9,.05,1.49),e);S.lep=V(-.2,.3,-1);S.yaw+=.2*e;S.px+=.08*e;S.lean+=.08*e;S.lf=add(S.lf,V(.12*sm(p*3),0,0));S.hd=V(.02*e,-.03*e,-.02*e);}
-      else if(m==='cross'){e=curve(p,.36,.48);S.rw=mixv(S.rw,V(.93,-.02,1.48),e);S.rep=V(-.2,-.3,-1);S.yaw+=.8*e;S.tw+=.25*e;S.px+=.1*e;S.lean+=.13*e;S.rf=add(S.rf,V(.06*e,.02*e,.04*e));S.lw=mixv(S.lw,V(.26,.1,1.6),e);}
-      else if(m==='hook'){e=curve(p,.42,.52);S.lw=bez(S.lw,V(.42,.55,1.5),V(.64,-.1,1.52),e);S.lep=V(0,1,.25);S.yaw-=.55*e;S.tw-=.3*e;S.lean+=.08*e;}
-      else if(m==='elbow'){e=curve(p,.42,.52);S.rw=bez(S.rw,V(.1,-.35,1.72),V(.34,.14,1.64),e);S.rep=V(1,-.6,.5);S.yaw+=.95*e;S.tw+=.3*e;S.px+=.1*e;S.lean+=.15*e;}
-      else if(m==='kick'||m==='headkick'){e=curve(p,.5,.6);var hi=m==='headkick',end=hi?V(.84,.08,1.66):V(.86,.1,1.2);
+    function attack(S,m,p){var e,wu=p<.16?-.22*Math.sin(Math.PI*p/.16):0;
+      if(m==='jab'){e=wu+curve(p,.33,.46);S.lw=mixv(S.lw,V(.9,.05,1.49),e);S.lep=V(-.2,.3,-1);S.yaw+=.2*e;S.px+=.08*e;S.lean+=.08*e;S.lf=add(S.lf,V(.12*sm(p*3),0,0));S.hd=V(.02*e,-.03*e,-.02*e);}
+      else if(m==='cross'){e=wu+curve(p,.36,.48);S.rw=mixv(S.rw,V(.93,-.02,1.48),e);S.rep=V(-.2,-.3,-1);S.yaw+=.8*e;S.tw+=.25*e;S.px+=.1*e;S.lean+=.13*e;S.rf=add(S.rf,V(.06*e,.02*e,.04*e));S.lw=mixv(S.lw,V(.26,.1,1.6),e);}
+      else if(m==='hook'){e=wu+curve(p,.42,.52);S.lw=bez(S.lw,V(.42,.55,1.5),V(.64,-.1,1.52),e);S.lep=V(0,1,.25);S.yaw-=.55*e;S.tw-=.3*e;S.lean+=.08*e;}
+      else if(m==='elbow'){e=wu+curve(p,.42,.52);S.rw=bez(S.rw,V(.1,-.35,1.72),V(.34,.14,1.64),e);S.rep=V(1,-.6,.5);S.yaw+=.95*e;S.tw+=.3*e;S.px+=.1*e;S.lean+=.15*e;}
+      else if(m==='kick'||m==='headkick'){e=wu+curve(p,.5,.6);var hi=m==='headkick',end=hi?V(.84,.08,1.66):V(.86,.1,1.2);
         S.rf=p<.5?bez(S.rf,V(-.12,-.8,.75),end,sm(p/.5)):mixv(end,GUARD.rf,sm((p-.6)/.4)*(p>.6?1:0));
         S.rkp=V(.5,-.2,1);S.yaw+=1.35*e;S.tw+=.2*e;S.lean-=(hi?.45:.32)*e;S.pz+=.07*e;S.side-=.1*e;
         S.lf=add(S.lf,V(.05*e,.1*e,0));S.rw=mixv(S.rw,V(-.2,-.46,1.02),e);S.lw=mixv(S.lw,V(.24,.16,1.62),e);S.hd=V(-.04*e,.03*e,0);}
-      else if(m==='teep'){e=curve(p,.45,.58);S.lf=p<.45?bez(GUARD.lf,V(.34,.15,.95),V(.98,.12,1.02),sm(p/.45)):mixv(V(.98,.12,1.02),GUARD.lf,sm((p-.58)/.42)*(p>.58?1:0));
+      else if(m==='teep'){e=wu+curve(p,.45,.58);S.lf=p<.45?bez(GUARD.lf,V(.34,.15,.95),V(.98,.12,1.02),sm(p/.45)):mixv(V(.98,.12,1.02),GUARD.lf,sm((p-.58)/.42)*(p>.58?1:0));
         S.lkp=V(1,.1,.6);S.lean-=.3*e;S.px-=.05*e;S.pz+=.03*e;S.rw=mixv(S.rw,V(.1,-.3,1.25),e*.6);}
-      else if(m==='knee'){var g=sm(p*4);e=curve(p,.52,.62);S.lw=mixv(S.lw,V(.62,.13,1.64),g);S.rw=mixv(S.rw,V(.62,-.13,1.64),g);S.lep=V(0,1,-.3);S.rep=V(0,-1,-.3);
+      else if(m==='knee'){var g=sm(p*4);e=wu+curve(p,.52,.62);S.lw=mixv(S.lw,V(.62,.13,1.64),g);S.rw=mixv(S.rw,V(.62,-.13,1.64),g);S.lep=V(0,1,-.3);S.rep=V(0,-1,-.3);
         S.rf=p<.52?bez(GUARD.rf,V(.05,-.08,.3),V(.32,-.06,.62),sm(p/.52)):mixv(V(.32,-.06,.62),GUARD.rf,sm((p-.62)/.38)*(p>.62?1:0));S.rkp=V(1,0,.35);
         S.px+=.1*g;S.lean-=.12*e;S.yaw+=.3*e;S.pz+=.05*e;}
       return e;}
@@ -1669,7 +1669,11 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
       else if(kind==='check'){S.lf=mixv(S.lf,V(.3,.28,.52),c);S.lkp=V(1,1,.2);S.lean-=.04*c;S.lw=mixv(S.lw,V(.24,.14,1.64),c);S.rw=mixv(S.rw,V(.22,-.1,1.64),c);}
       else if(kind==='slip'){S.side-=.2*c;S.lean+=.14*c;S.pz-=.06*c;}
       else if(kind==='clinch'){S.lw=mixv(S.lw,V(.52,.15,1.52),c);S.rw=mixv(S.rw,V(.52,-.15,1.52),c);S.lean+=.2*c;S.lep=V(0,1,-.5);S.rep=V(0,-1,-.5);}}
-    function hurt(S,h){S.hd=add(S.hd,V(-.13*h,.02*h,-.02*h));S.lean-=.2*h;S.px-=.12*h;}
+    function hurt(S,h,m){
+      if(m==='hook'||m==='elbow'){S.hd=add(S.hd,V(-.05*h,-.14*h,-.03*h));S.tw-=.4*h;S.side+=.14*h;S.lean-=.06*h;}
+      else if(m==='kick'||m==='knee'){S.lean+=.3*h;S.pz-=.07*h;S.px-=.08*h;S.lw=mixv(S.lw,V(.2,.12,1.18),h*.8);S.rw=mixv(S.rw,V(.18,-.12,1.16),h*.8);S.hd=add(S.hd,V(.02*h,0,-.04*h));}
+      else if(m==='teep'){S.lean-=.25*h;S.px-=.16*h;}
+      else{S.hd=add(S.hd,V(-.15*h,.03*h,-.02*h));S.lean-=.22*h;S.px-=.12*h;}}
     // One round, fighting-game style: ROUND 1 / FIGHT!, exchanges that wear both health bars down, then a head kick knockout.
     var DMG={jab:5,cross:8,hook:9,elbow:11,kick:10,headkick:100,teep:5,knee:7},CHIP={cover:1,check:1};
     var COMBOS=[{a:['jab'],d:'cover'},{a:['jab','cross'],d:'cover'},{a:['jab','cross','kick'],d:'check'},{a:['kick'],d:'check'},{a:['teep'],d:'absorb'},
@@ -1699,7 +1703,8 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
         for(i=0;i<ex.mv.length;i++){var m2=ex.mv[i],c=sm((tt-m2.t0+.12)/.18)*(1-sm((tt-m2.t1+.1)/.2)),k=m2.k,since=tt-m2.ti;
           if(k==='cover'||k==='check'||k==='slip')defend(df,k,c);else if(k==='land')defend(df,'cover',c*.3);
           if(k==='clinch')clinch=true;
-          if(since>=0&&(k==='land'||k==='clinch'))hurt(df,Math.exp(-since*6)*(k==='clinch'?.6:1));
+          if(since>=0&&(k==='land'||k==='clinch'))hurt(df,Math.exp(-since*5)*(k==='clinch'?.7:1),m2.m);
+          if(since>=0&&since<.5&&(k==='cover'||k==='check')){var bk2=Math.exp(-since*9)*sm(since*30);df.px-=.07*bk2;df.lean+=.08*bk2;df.pz-=.02*bk2;}
           if(since>=0&&k==='absorb'){var h=Math.exp(-since*3.5);push+=.28*(1-Math.exp(-since*8));df.lean+=.25*h;df.px-=.08*h;}}
         if(clinch)defend(df,'clinch',on);}
       if(tt>=TKO){var k2=tt-TKO,hk=KOEX.mv[KOEX.mv.length-1];
@@ -1942,7 +1947,8 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
         ([AX+posts[i][0]*RS,AY+posts[i][1]*RS],[AX+posts[(i+1)%4][0]*RS,AY+posts[(i+1)%4][1]*RS]);}
       // the fight: its own clock (slow motion through the knockout), fighters side-on to the fight camera, the referee
       var dt=FT.last<0?0:Math.min(.1,s-FT.last);FT.last=s;
-      if(!calm){var spd=FT.clock>=TKO&&FT.clock<TKO+1.1?.2+.8*sm((FT.clock-TKO-.5)/.6):1;FT.clock+=dt*spd;if(FT.clock>=LOOP)FT.clock-=LOOP;}
+      if(!calm){var spd=FT.clock>=TKO&&FT.clock<TKO+1.1?.2+.8*sm((FT.clock-TKO-.5)/.6):1;
+        if(FT.clock<TKO)for(var hs=0;hs<EV.length;hs++){var he=EV[hs],ha=FT.clock-he.t;if(ha<0)break;if(he.land&&ha<(/kick|cross|elbow|knee/.test(he.m)?.1:.065)){spd=.06;break;}}FT.clock+=dt*spd;if(FT.clock>=LOOP)FT.clock-=LOOP;}
       var tt=calm?CALM_T:FT.clock;CUR_TT=tt;
       var S=fight(tt,calm?0:dt),want=Math.PI-cam.yaw*Math.PI/180,dth=Math.atan2(Math.sin(want-FT.th),Math.cos(want-FT.th));
       if(calm)FT.th=fcv>.5?want:.4;else FT.th+=dt*.3*(1-fcv)+dth*Math.min(1,dt*6)*fcv;
@@ -2017,7 +2023,9 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
       out.sort(function(a,b){return b.z-a.z;});return out;}
 
     // ---------- draw ----------
+    var ZPUNCH=0;
     function draw(now){
+      ZPUNCH=0;if(!calm&&fightCam()>0){for(var zp=0;zp<EV.length;zp++){var ze=EV[zp],za=CUR_TT-ze.t;if(za<0)break;if(ze.land&&za<.35)ZPUNCH=Math.max(ZPUNCH,(ze===KOEV?.09:/kick|cross|elbow|knee/.test(ze.m)?.045:.025)*Math.sin(Math.PI*Math.min(1,za/.35))*fightCam());}}
       setup();ctx.setTransform(dpr,0,0,dpr,0,0);var i,s=(now-t0)/1000;NEON.length=0;
       // screen shake on heavy shots, hardest on the knockout
       var shk=0;if(!calm&&fightCam()>0){for(i=0;i<EV.length;i++){var e0=EV[i],a0=CUR_TT-e0.t;if(a0<0)break;if(a0<.3&&e0.land)shk=Math.max(shk,(e0===KOEV?14:/kick|cross|elbow|knee/.test(e0.m)?4:2)*(1-a0/.3));}}
