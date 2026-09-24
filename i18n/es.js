@@ -223,6 +223,8 @@ window.LR_ES={
 "Get directions": "Cómo llegar",
 "Street map": "Mapa de calles",
 "3D map": "Mapa 3D",
+"Ringside": "Junto al ring",
+"Zoom out": "Alejar",
 "Show route": "Ver ruta",
 "Drag to turn · tap a train below": "Arrastra para girar · toca un tren abajo",
 "Illustrated 3D map: Lion’s Roar on West Kingsbridge Road, across from the Kingsbridge Armory, a short walk from the 4 train at Jerome Avenue": "Mapa 3D ilustrado: Lion’s Roar en West Kingsbridge Road, frente al Kingsbridge Armory, a poca distancia del tren 4 en Jerome Avenue",
