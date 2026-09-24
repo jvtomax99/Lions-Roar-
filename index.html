@@ -432,11 +432,28 @@ footer a:hover{color:var(--yellow)}
 .map iframe{position:absolute;inset:0;width:100%;height:100%;border:0;filter:invert(.92) hue-rotate(180deg) saturate(.55) brightness(.95) contrast(.95)}
 .map .ph{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:12px;text-align:center;font-family:var(--cond);font-weight:600;font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .map .ph svg{color:var(--yellow)}
+.map canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab}
+.map canvas:active{cursor:grabbing}
+.map.street canvas,.map.street .map-hint{display:none}
+.map.live:not(.street) .ph{display:none}
+.map:not(.street) iframe{display:none}
+.map-mode{position:absolute;right:12px;top:12px;z-index:2;min-height:40px;padding:0 14px;border:1px solid rgba(243,235,221,.4);background:rgba(11,11,11,.78);color:var(--cream);font-family:var(--cond);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.map-mode:hover{border-color:var(--yellow);color:var(--yellow)}
+.map-mode:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
+.map-mode .to-3d,.map-mode[aria-pressed="true"] .to-street{display:none}
+.map-mode[aria-pressed="true"] .to-3d{display:inline}
+.map-hint{position:absolute;left:12px;bottom:10px;z-index:1;font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(243,235,221,.55);pointer-events:none}
 .map .tag{position:absolute;left:14px;top:14px;z-index:1;background:var(--yellow);color:var(--black);padding:6px 10px;font-family:var(--cond);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;pointer-events:none}
 .findus address{margin:24px 0 0;font-style:normal;font-size:clamp(20px,1.8vw,24px);line-height:1.45}
 .findus address small{display:block;margin-top:6px;font-size:16px;color:var(--muted)}
 .ways{list-style:none;margin:26px 0 0;padding:0;display:grid;gap:0}
-.ways li{display:grid;grid-template-columns:52px 1fr;gap:16px;align-items:center;padding:14px 0;border-top:1px solid var(--line)}
+.ways li{border-top:1px solid var(--line)}
+.ways button{display:grid;grid-template-columns:52px 1fr auto;gap:16px;align-items:center;width:100%;padding:14px 0;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;transition:background .2s,padding .2s}
+.ways button:hover,.ways button[aria-pressed="true"]{background:rgba(255,204,0,.07);padding-inline:10px}
+.ways button:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
+.ways button[aria-pressed="true"] b{background:var(--yellow);color:var(--black)}
+.ways .show{font-style:normal;font-family:var(--cond);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow);white-space:nowrap}
+.ways button[aria-pressed="true"] .show{visibility:hidden}
 .ways b{display:grid;place-items:center;height:40px;border:1.5px solid var(--yellow);font-family:var(--head);font-weight:400;font-size:20px;color:var(--yellow)}
 .ways span{font-size:16px;line-height:1.45;color:#D9D0C2}
 .ways span strong{display:block;font-family:var(--cond);font-weight:700;font-size:17px;letter-spacing:.08em;text-transform:uppercase;color:var(--cream)}
@@ -962,7 +979,9 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
 <section class="section wrap" id="find">
   <div class="findus">
     <div class="map" id="map">
-      <span class="tag">Lion’s Roar · Room 6</span>
+      <canvas id="map3d" role="img" aria-label="Illustrated 3D map: Lion’s Roar on West Kingsbridge Road, across from the Kingsbridge Armory, a short walk from the 4 train at Jerome Avenue"></canvas>
+      <button type="button" class="map-mode" id="mapMode" aria-pressed="false"><span class="to-street">Street map</span><span class="to-3d">3D map</span></button>
+      <span class="map-hint" aria-hidden="true">Drag to turn · tap a train below</span>
       <div class="ph"><svg width="34" height="44" viewBox="0 0 34 44" aria-hidden="true"><path d="M17 2C9 2 3 8 3 16c0 10 14 26 14 26s14-16 14-26C31 8 25 2 17 2z" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="17" cy="16" r="5" fill="currentColor"/></svg>80 W Kingsbridge Rd · Bronx</div>
       <noscript><a class="ph" href="https://www.google.com/maps/search/?api=1&amp;query=80+W+Kingsbridge+Rd,+Bronx,+NY+10468">Open the map</a></noscript>
     </div>
@@ -971,9 +990,9 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
       <h2 class="h2">Find the <span class="r">den.</span></h2>
       <address>80 West Kingsbridge Road, Room 6<br>Bronx, NY 10468<small>Across from the Kingsbridge Armory</small></address>
       <ul class="ways">
-        <li><b>4</b><span><strong>4 train · Kingsbridge Rd</strong>Jerome Avenue station, a short walk</span></li>
-        <li><b>B·D</b><span><strong>B / D · Kingsbridge Rd</strong>Grand Concourse station, about 10 minutes on foot</span></li>
-        <li><b>Bus</b><span><strong>Bx9</strong>Runs along Kingsbridge Road</span></li>
+        <li><button type="button" data-route="4" aria-pressed="false"><b>4</b><span><strong>4 train · Kingsbridge Rd</strong>Jerome Avenue station, a short walk</span><i class="show" aria-hidden="true">Show route</i></button></li>
+        <li><button type="button" data-route="bd" aria-pressed="false"><b>B·D</b><span><strong>B / D · Kingsbridge Rd</strong>Grand Concourse station, about 10 minutes on foot</span><i class="show" aria-hidden="true">Show route</i></button></li>
+        <li><button type="button" data-route="bus" aria-pressed="false"><b>Bus</b><span><strong>Bx9</strong>Runs along Kingsbridge Road</span><i class="show" aria-hidden="true">Show route</i></button></li>
       </ul>
       <div class="ctas">
         <a class="btn btn-red" id="dirBtn" href="https://www.google.com/maps/dir/?api=1&amp;destination=80+W+Kingsbridge+Rd,+Bronx,+NY+10468" target="_blank" rel="noopener">Get directions <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M1 6H16M11 1L16 6L11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
@@ -1250,14 +1269,208 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
     new MutationObserver(upd).observe(document.getElementById('drawer'),{attributes:true,attributeFilter:['class']});
   })();
 
-  // Find us: the map only loads when it comes near the screen; iPhones/Macs get Apple Maps directions
+  // Find us: an illustrated 3D map of the block, drawn on a canvas (no map service needed).
+  // Metres, x east / y north, Jerome Ave at x=0, Kingsbridge Rd at y=0. Illustrated, not to scale:
+  // the streets, the Armory, the el, the parks and the stations are placed from their real layout; the
+  // surrounding apartment blocks are generated. "Street map" swaps in Google Maps for exact directions.
   (function(){
-    var box=$('map');if(!box)return;
-    function load(){if(box.querySelector('iframe'))return;var f=document.createElement('iframe');
-      f.src='https://www.google.com/maps?q=80+W+Kingsbridge+Rd,+Bronx,+NY+10468&z=16&output=embed';f.title='Map: Lion’s Roar Muay Thai, 80 W Kingsbridge Rd, Bronx';f.loading='lazy';f.referrerPolicy='no-referrer-when-downgrade';
-      f.addEventListener('load',function(){var ph=box.querySelector('.ph');if(ph)ph.style.display='none';});box.appendChild(f);}
-    if('IntersectionObserver' in window){var o=new IntersectionObserver(function(es){if(es[0].isIntersecting){load();o.disconnect();}},{rootMargin:'600px 0px'});o.observe(box);}else{load();}
+    var box=$('map'),cv=$('map3d');if(!box)return;
+    var es=function(){return document.documentElement.lang==='es';};
+    function L(en,sp){return es()?sp:en;}
+    var streetBtn=$('mapMode'),gmap=null;
+    function street(on){box.classList.toggle('street',on);if(streetBtn)streetBtn.setAttribute('aria-pressed',on?'true':'false');
+      if(on&&!gmap){gmap=document.createElement('iframe');gmap.src='https://www.google.com/maps?q=80+W+Kingsbridge+Rd,+Bronx,+NY+10468&z=16&output=embed';gmap.title='Map: Lion’s Roar Muay Thai, 80 W Kingsbridge Rd, Bronx';gmap.loading='lazy';gmap.referrerPolicy='no-referrer-when-downgrade';box.appendChild(gmap);}
+      if(!on)wake();}
+    if(streetBtn)streetBtn.addEventListener('click',function(){street(!box.classList.contains('street'));});
     if(/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent)){var d=$('dirBtn');if(d)d.href='https://maps.apple.com/?daddr=80+W+Kingsbridge+Rd,+Bronx,+NY+10468';}
+    if(!cv||!cv.getContext){street(true);return;}
+    var ctx=cv.getContext('2d');box.classList.add('live');
+
+    // ---------- the scene ----------
+    var R=[ // roads: x0,y0,x1,y1 (axis-aligned rectangles)
+      [-560,-11,760,11],            // Kingsbridge Rd
+      [-12,-460,12,460],            // Jerome Ave (under the el)
+      [-213,-460,-197,460],         // Reservoir Ave
+      [-213,158,0,172],             // W 195th St
+      [272,-460,288,460],           // Creston Ave
+      [538,-460,582,460],           // Grand Concourse
+      [-560,-150,-213,-138],[12,-342,538,-330],[582,-212,760,-200],[-560,238,-213,250],[288,190,538,202],[-420,-460,-408,-11],[-420,11,-408,460],[400,11,412,190],[680,-460,692,460]
+    ];
+    var PARKS=[[16,-326,268,-100,'St. James Park'],[586,-196,676,-15,'Poe Park']];
+    var rnd=(function(s){return function(){s=(s*16807)%2147483647;return (s-1)/2147483646;};})(1990);
+    function onRoad(x0,y0,x1,y1){for(var i=0;i<R.length;i++){var r=R[i];if(x1>r[0]-3&&x0<r[2]+3&&y1>r[1]-3&&y0<r[3]+3)return true;}return false;}
+    function inPark(x0,y0,x1,y1){for(var i=0;i<PARKS.length;i++){var p=PARKS[i];if(x1>p[0]&&x0<p[2]&&y1>p[1]&&y0<p[3])return true;}return false;}
+    var TINT=[[52,48,43],[60,46,39],[47,46,45],[58,52,43],[54,44,40]];
+    var B=[]; // boxes: x0,y0,x1,y1,h,kind
+    var ARM=[-190,26,-24,156];
+    var GYM=[-124,-50,-82,-15];
+    B.push([ARM[0],ARM[1],ARM[2],ARM[3],24,'arm']);
+    B.push([-196,17,-172,41,38,'tower']);B.push([-42,17,-18,41,38,'tower']);
+    B.push([GYM[0],GYM[1],GYM[2],GYM[3],19,'gym']);
+    for(var gx=-548;gx<750;gx+=34){for(var gy=-452;gy<452;gy+=34){
+      var w=24+rnd()*8,dp=24+rnd()*8,x0=gx+rnd()*4,y0=gy+rnd()*4,x1=x0+w,y1=y0+dp;
+      if(onRoad(x0,y0,x1,y1)||inPark(x0,y0,x1,y1))continue;
+      if(x1>ARM[0]-14&&x0<ARM[2]+14&&y1>ARM[1]-14&&y0<ARM[3]+14)continue;
+      if(x1>GYM[0]-6&&x0<GYM[2]+6&&y1>GYM[1]-6&&y0<GYM[3]+6)continue;
+      if(rnd()<.12)continue;
+      var h=13+rnd()*11;if(rnd()<.08)h+=14;
+      B.push([x0,y0,x1,y1,h,'b',TINT[Math.floor(rnd()*TINT.length)]]);}}
+    // the elevated 4 train: deck over Jerome Ave with columns; the station at Kingsbridge Rd
+    for(var dy=-460;dy<460;dy+=30)B.push([-7,dy,7,dy+30,2,'deck',11]);
+    for(var cy=-450;cy<=450;cy+=30){B.push([-7,cy-1,-5,cy+1,11,'col']);B.push([5,cy-1,7,cy+1,11,'col']);}
+    B.push([-9,-40,9,70,5,'stn',13]);
+    // B/D entrances on the Grand Concourse
+    B.push([528,-26,534,-18,3,'ent']);B.push([586,16,592,24,3,'ent']);
+
+    // ---------- camera ----------
+    var cam={tx:-70,ty:10,yaw:-28,pitch:40,dist:700},W=1,H=1,F=1,dpr=1,C=[0,0,0],fx,fy,fz,rx,ry,ux,uy,uz;
+    function setup(){var t=cam.yaw*Math.PI/180,p=cam.pitch*Math.PI/180;
+      fx=Math.cos(p)*Math.sin(t);fy=Math.cos(p)*Math.cos(t);fz=-Math.sin(p);
+      rx=Math.cos(t);ry=-Math.sin(t);
+      ux=ry*fz;uy=-rx*fz;uz=rx*fy-ry*fx;
+      var D=cam.dist*span();C=[cam.tx-D*fx,cam.ty-D*fy,-D*fz];
+      F=H/(2*Math.tan(17*Math.PI/180));}
+    function span(){return Math.max(1,1.45/(W/H));}
+    function P(x,y,z){var dx=x-C[0],dy=y-C[1],dz=z-C[2],zc=dx*fx+dy*fy+dz*fz;if(zc<5)return null;
+      var xc=dx*rx+dy*ry,yc=dx*ux+dy*uy+dz*uz;return [W/2+xc*F/zc,H*.54-yc*F/zc,zc];}
+    function poly(pts,fill,stroke){ctx.beginPath();for(var i=0;i<pts.length;i++){if(i)ctx.lineTo(pts[i][0],pts[i][1]);else ctx.moveTo(pts[i][0],pts[i][1]);}ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.stroke();}}
+    function quad(a,b,c,d){var A=P(a[0],a[1],a[2]),Bq=P(b[0],b[1],b[2]),Cq=P(c[0],c[1],c[2]),D=P(d[0],d[1],d[2]);return A&&Bq&&Cq&&D?[A,Bq,Cq,D]:null;}
+    var BG=[13,12,12];
+    // flat ground pieces are cut into tiles so a road running behind the camera only loses the tiles back there
+    function ground(x0,y0,x1,y1,col){ctx.fillStyle=col;ctx.strokeStyle=col;ctx.lineWidth=1;
+      var sx=Math.max(1,Math.ceil((x1-x0)/60)),sy=Math.max(1,Math.ceil((y1-y0)/60)),dx=(x1-x0)/sx,dy=(y1-y0)/sy;
+      for(var i=0;i<sx;i++)for(var j=0;j<sy;j++){var q=quad([x0+i*dx,y0+j*dy,0],[x0+(i+1)*dx,y0+j*dy,0],[x0+(i+1)*dx,y0+(j+1)*dy,0],[x0+i*dx,y0+(j+1)*dy,0]);if(q){poly(q);ctx.fill();ctx.stroke();}}}
+    function mix(c,k){return 'rgb('+Math.round(c[0]+(BG[0]-c[0])*k)+','+Math.round(c[1]+(BG[1]-c[1])*k)+','+Math.round(c[2]+(BG[2]-c[2])*k)+')';}
+    function fog(z){return Math.max(0,Math.min(.82,(z-cam.dist*.55)/(cam.dist*2.4)));}
+
+    // ---------- moving things ----------
+    var t0=performance.now(),route=null,routeT=0;
+    var ROUTES={
+      '4':{pts:[[-9,-14],[-40,-14],[-86,-14]],cam:{tx:-45,ty:0,yaw:-22,pitch:40,dist:430},lab:['2 min walk','2 min a pie']},
+      'bd':{pts:[[548,-14],[300,-14],[12,-14],[-86,-14]],cam:{tx:230,ty:10,yaw:-8,pitch:46,dist:1150},lab:['About 9 min walk','Unos 9 min a pie']},
+      'bus':{pts:[[700,-5],[-86,-5]],cam:{tx:120,ty:10,yaw:-40,pitch:48,dist:1150},lab:['Bx9 · stops by the gym','Bx9 · para cerca del gym']}
+    };
+    function faces(list,now){
+      var s=(now-t0)/1000,out=[];
+      function boxF(b,col,topCol,base){var x0=b[0],y0=b[1],x1=b[2],y1=b[3],z0=base||0,z1=z0+b[4];
+        var sides=[[x0,y0,x1,y0,0,-1],[x1,y0,x1,y1,1,0],[x1,y1,x0,y1,0,1],[x0,y1,x0,y0,-1,0]];
+        for(var i=0;i<4;i++){var sd=sides[i],mx=(sd[0]+sd[2])/2,my=(sd[1]+sd[3])/2;
+          if((mx-C[0])*sd[4]+(my-C[1])*sd[5]>=0)continue;
+          var q=quad([sd[0],sd[1],z0],[sd[2],sd[3],z0],[sd[2],sd[3],z1],[sd[0],sd[1],z1]);if(!q)continue;
+          var lit=.58+.42*Math.max(0,.55*sd[4]-.83*sd[5]);
+          out.push({q:q,z:(q[0][2]+q[1][2]+q[2][2]+q[3][2])/4+2,c:col,k:lit,b:b,side:sd,z0:z0,z1:z1});}
+        if(C[2]>z1){var q2=quad([x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]);if(q2)out.push({q:q2,z:(q2[0][2]+q2[2][2])/2,c:topCol,k:1,b:b,top:1});}}
+      for(var i=0;i<list.length;i++){var b=list[i],k=b[5];
+        if(k==='b')boxF(b,b[6],[b[6][0]+18,b[6][1]+16,b[6][2]+13]);
+        else if(k==='arm')boxF(b,[92,70,52],[110,86,64]);
+        else if(k==='tower')boxF(b,[104,80,58],[124,96,70]);
+        else if(k==='gym')boxF(b,[255,196,0],[255,221,77]);
+        else if(k==='deck')boxF(b,[70,66,60],[88,82,74],b[6]);
+        else if(k==='stn')boxF(b,[96,90,80],[120,112,98],b[6]);
+        else if(k==='col')boxF(b,[60,56,50],[60,56,50]);
+        else if(k==='ent')boxF(b,[255,204,0],[255,224,110]);}
+      { // the 4 train on the el, the Bx9 on Kingsbridge Rd
+        var ty=((s*34)%1100)-550;
+        for(var c=0;c<5;c++){var y0=ty-c*19;if(y0<-470||y0>470)continue;boxF([-4,y0-17,4,y0,3.4],[178,184,190],[205,210,214],13);}
+        var bx=700-((s*16)%1300);boxF([bx,-9,bx+13,-5.5,3.4],[40,110,190],[228,232,236]);
+        var bx2=-560+((s*14+500)%1300);boxF([bx2-13,4,bx2,7.5,3.4],[40,110,190],[228,232,236]);}
+      out.sort(function(a,b){return b.z-a.z;});return out;}
+
+    // ---------- draw ----------
+    function draw(now){
+      setup();ctx.setTransform(dpr,0,0,dpr,0,0);
+      var g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0b0b0b');g.addColorStop(1,'#16130f');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+      // ground
+      var i;
+      for(i=0;i<PARKS.length;i++){var p=PARKS[i];ground(p[0],p[1],p[2],p[3],'#18251a');}
+      for(i=0;i<R.length;i++){var r=R[i];ground(r[0],r[1],r[2],r[3],i===0?'#2c2822':'#24211d');}
+      // Kingsbridge Rd centre line
+      ctx.setLineDash([6,8]);ctx.lineWidth=1;ctx.strokeStyle='rgba(255,204,0,.28)';ctx.beginPath();
+      for(var lx=-560;lx<760;lx+=40){var a=P(lx,0,0),b2=P(lx+40,0,0);if(a&&b2){ctx.moveTo(a[0],a[1]);ctx.lineTo(b2[0],b2[1]);}}ctx.stroke();ctx.setLineDash([]);
+      // park trees
+      ctx.fillStyle='#24402a';for(i=0;i<TREES.length;i++){var tp=P(TREES[i][0],TREES[i][1],0);if(tp){var rr=Math.max(1,TREES[i][2]*F/tp[2]);ctx.beginPath();ctx.arc(tp[0],tp[1]-rr*.6,rr,0,6.283);ctx.fill();}}
+      // walking route
+      var s=(now-t0)/1000;
+      if(route){var rt=ROUTES[route],pts=[];for(i=0;i<rt.pts.length-1;i++){var A=rt.pts[i],Bp=rt.pts[i+1],n=Math.max(1,Math.ceil(Math.hypot(Bp[0]-A[0],Bp[1]-A[1])/20));
+          for(var j=0;j<=n;j++){var pp=P(A[0]+(Bp[0]-A[0])*j/n,A[1]+(Bp[1]-A[1])*j/n,.5);if(pp)pts.push(pp);}}
+        if(pts.length>1){ctx.lineCap='round';ctx.lineWidth=Math.max(3,5*F/cam.dist*.9);ctx.strokeStyle='rgba(255,204,0,.25)';ctx.beginPath();pts.forEach(function(q,j){j?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]);});ctx.stroke();
+          ctx.setLineDash([2,9]);ctx.lineDashOffset=calm?0:-s*28;ctx.lineWidth=Math.max(3,4.2*F/cam.dist*.9);ctx.strokeStyle='#FFCC00';ctx.stroke();ctx.setLineDash([]);}}
+      // gym ring on the ground
+      var gc=P((GYM[0]+GYM[2])/2,(GYM[1]+GYM[3])/2,0);
+      if(gc){var ph=calm?.5:(s%2.2)/2.2,rad=(20+ph*46)*F/gc[2];ctx.strokeStyle='rgba(255,204,0,'+(0.7*(1-ph)).toFixed(3)+')';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(gc[0],gc[1],rad,rad*Math.sin(cam.pitch*Math.PI/180),0,0,6.283);ctx.stroke();}
+      // buildings, el, train, bus
+      var fs=faces(B,now);
+      for(i=0;i<fs.length;i++){var f=fs[i],c=f.c,k=f.k,fg=fog(f.z),col=[c[0]*k,c[1]*k,c[2]*k];
+        poly(f.q,mix(col,fg));
+        if(f.b[5]==='b'&&!f.top&&f.z<cam.dist*1.5){ // floor lines + a few lit windows
+          var n=Math.floor((f.z1-f.z0)/3.3),sd=f.side;ctx.strokeStyle='rgba(0,0,0,'+(0.28*(1-fg))+')';ctx.lineWidth=1;ctx.beginPath();
+          for(var fl=1;fl<n;fl++){var zz=f.z0+fl*3.3,p1=P(sd[0],sd[1],zz),p2=P(sd[2],sd[3],zz);if(p1&&p2){ctx.moveTo(p1[0],p1[1]);ctx.lineTo(p2[0],p2[1]);}}ctx.stroke();
+          var seed=Math.abs(Math.floor(f.b[0]*7+f.b[1]*13+sd[4]*3+sd[5]*5));ctx.fillStyle='rgba(255,196,90,'+(0.75*(1-fg))+')';
+          for(var wn=0;wn<4;wn++){seed=(seed*9301+49297)%233280;if(seed%5>1)continue;var u=((seed%97)/97)*.8+.1,fl2=1+seed%Math.max(1,n-1),zw=f.z0+fl2*3.3-1.9,
+            wx=sd[0]+(sd[2]-sd[0])*u,wy=sd[1]+(sd[3]-sd[1])*u,wp=P(wx,wy,zw);if(wp){var ws=Math.max(1,1.3*F/wp[2]);ctx.fillRect(wp[0]-ws,wp[1]-ws*.8,ws*2,ws*1.6);}}}
+        if(f.b[5]==='arm'&&f.top){ // the Armory's barrel roof: ribs across the drill hall
+          ctx.strokeStyle='rgba(40,28,18,.55)';ctx.lineWidth=1;ctx.beginPath();for(var ax=f.b[0]+12;ax<f.b[2];ax+=12){var r1=P(ax,f.b[1],f.b[4]),r2=P(ax,f.b[3],f.b[4]);if(r1&&r2){ctx.moveTo(r1[0],r1[1]);ctx.lineTo(r2[0],r2[1]);}}ctx.stroke();}
+      }
+      // light beam over the gym
+      var gb=P((GYM[0]+GYM[2])/2,(GYM[1]+GYM[3])/2,19),gt=P((GYM[0]+GYM[2])/2,(GYM[1]+GYM[3])/2,140);
+      if(gb&&gt){var bw=Math.max(6,22*F/gb[2]),lg=ctx.createLinearGradient(0,gb[1],0,gt[1]);lg.addColorStop(0,'rgba(255,204,0,.45)');lg.addColorStop(1,'rgba(255,204,0,0)');
+        ctx.fillStyle=lg;ctx.beginPath();ctx.moveTo(gb[0]-bw/2,gb[1]);ctx.lineTo(gt[0]-bw*.2,gt[1]);ctx.lineTo(gt[0]+bw*.2,gt[1]);ctx.lineTo(gb[0]+bw/2,gb[1]);ctx.closePath();ctx.fill();}
+      // labels
+      labels(s);}
+    var TREES=[];(function(){for(var i=0;i<PARKS.length;i++){var p=PARKS[i];for(var x=p[0]+8;x<p[2]-4;x+=15)for(var y=p[1]+8;y<p[3]-4;y+=15){if(rnd()<.55)TREES.push([x+rnd()*6,y+rnd()*6,4+rnd()*2.5]);}}})();
+    var placed=[];
+    function free(x0,y0,x1,y1){for(var i=0;i<placed.length;i++){var r=placed[i];if(x1>r[0]&&x0<r[2]&&y1>r[1]&&y0<r[3])return false;}placed.push([x0,y0,x1,y1]);return true;}
+    function tag(x,y,z,txt,kind){var p=P(x,y,z);if(!p||p[0]<-40||p[0]>W+40||p[1]<-20||p[1]>H+20)return;
+      ctx.font=(kind==='gym'?'700 14px ':kind==='road'?'600 10px ':'700 11px ')+'"Barlow Condensed",sans-serif';
+      var t=txt.toUpperCase(),w=ctx.measureText(t).width+(kind==='road'?0:14),h=kind==='gym'?24:kind==='road'?12:19,yy=p[1]-(kind==='road'?0:h+8);
+      if(kind==='route')yy=p[1]+12;
+      var cx=Math.max(w/2+6,Math.min(W-w/2-6,p[0])),top=kind==='road'?p[1]-h/2:yy;if(!free(cx-w/2-4,top-3,cx+w/2+4,top+h+3))return;var p0=p[0];p=[cx,p[1]];
+      if(kind==='road'){ctx.fillStyle='rgba(243,235,221,.5)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,p[0],p[1]);return;}
+      if(kind!=='route'){ctx.strokeStyle=kind==='gym'?'#FFCC00':'rgba(243,235,221,.55)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p0,p[1]);ctx.lineTo(p[0],yy+h);ctx.stroke();}
+      ctx.fillStyle=kind==='gym'||kind==='route'?'#FFCC00':kind==='park'?'rgba(24,37,26,.92)':'rgba(11,11,11,.86)';ctx.fillRect(p[0]-w/2,yy,w,h);
+      if(kind!=='gym'&&kind!=='route'){ctx.strokeStyle=kind==='stn'?'rgba(255,204,0,.8)':'rgba(243,235,221,.25)';ctx.strokeRect(p[0]-w/2+.5,yy+.5,w-1,h-1);}
+      ctx.fillStyle=kind==='gym'||kind==='route'?'#0B0B0B':kind==='stn'?'#FFCC00':'#F3EBDD';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,p[0],yy+h/2+1);}
+    function labels(s){
+      placed=[[0,H-34,W*.62,H],[W-150,0,W,62]]; // keep clear of the hint and the Street map button
+      tag((GYM[0]+GYM[2])/2,(GYM[1]+GYM[3])/2,21,'Lion’s Roar · Room 6','gym');
+      if(route){var rt=ROUTES[route],a=rt.pts[0],b=rt.pts[rt.pts.length-1];tag((a[0]+b[0])/2,(a[1]+b[1])/2,0,L(rt.lab[0],rt.lab[1]),'route');}
+      tag(0,20,19,L('4 train · Kingsbridge Rd','Tren 4 · Kingsbridge Rd'),'stn');
+      tag(560,0,4,'B · D · Kingsbridge Rd','stn');
+      tag(-107,91,26,'Kingsbridge Armory','land');
+      tag(142,-213,0,'St. James Park','park');tag(631,-105,0,'Poe Park','park');
+      tag(-330,0,0,'W Kingsbridge Rd','road');tag(430,0,0,'E Kingsbridge Rd','road');
+      tag(0,-300,14,'Jerome Ave','road');tag(0,330,14,'Jerome Ave','road');tag(-205,330,0,'Reservoir Ave','road');tag(560,330,0,'Grand Concourse','road');tag(280,-400,0,'Creston Ave','road');tag(-110,165,0,'W 195 St','road');}
+
+    // ---------- size, motion, input ----------
+    function resize(){var r=box.getBoundingClientRect();dpr=Math.min(window.devicePixelRatio||1,2);W=Math.max(1,r.width);H=Math.max(1,r.height);cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);}
+    var anim=null,raf=0,visible=false,last=0,userYaw=0,drag=null,started=false,idle=true;
+    function ease(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
+    function fly(to,ms){if(calm){for(var k in to)cam[k]=to[k];wake();return;}anim={from:{tx:cam.tx,ty:cam.ty,yaw:cam.yaw,pitch:cam.pitch,dist:cam.dist},to:to,t:performance.now(),ms:ms||1600};wake();}
+    var HOME={tx:-70,ty:10,yaw:-28,pitch:40,dist:700};
+    function frame(now){raf=0;if(!visible||box.classList.contains('street'))return;
+      if(anim){var k=Math.min(1,(now-anim.t)/anim.ms),e=ease(k);for(var key in anim.to){var a=anim.from[key],b=anim.to[key];cam[key]=a+(b-a)*e;}if(k>=1)anim=null;}
+      else if(!calm&&!drag&&idle){cam.yaw+=Math.sin(now/5200)*.018;}
+      if(now-last>(W<700?30:14)||anim){last=now;draw(now);}
+      if(!calm)raf=requestAnimationFrame(frame);}
+    function wake(){if(!raf&&visible){if(calm){draw(performance.now());}else raf=requestAnimationFrame(frame);}}
+    cv.addEventListener('pointerdown',function(e){drag={x:e.clientX,yaw:cam.yaw,id:e.pointerId};anim=null;});
+    cv.addEventListener('pointermove',function(e){if(!drag||e.pointerId!==drag.id)return;cam.yaw=drag.yaw-(e.clientX-drag.x)*.35;if(calm)draw(performance.now());});
+    ['pointerup','pointercancel','pointerleave'].forEach(function(n){cv.addEventListener(n,function(){drag=null;});});
+    // the "how to get here" rows pick a route and fly the camera to it
+    document.querySelectorAll('.ways [data-route]').forEach(function(btn){btn.addEventListener('click',function(){
+      var id=btn.dataset.route,same=route===id;route=same?null:id;
+      document.querySelectorAll('.ways [data-route]').forEach(function(o){o.setAttribute('aria-pressed',o===btn&&!same?'true':'false');});
+      if(box.classList.contains('street'))street(false);
+      fly(same?HOME:ROUTES[id].cam,1500);
+      if(window.innerWidth<1181&&!same){var r=box.getBoundingClientRect();if(r.top<0||r.bottom>window.innerHeight)box.scrollIntoView({behavior:calm?'auto':'smooth',block:'center'});}});});
+    resize();window.addEventListener('resize',function(){resize();if(calm)draw(performance.now());});
+    var intro={tx:120,ty:40,yaw:-80,pitch:78,dist:2300};
+    if('IntersectionObserver' in window){new IntersectionObserver(function(es){visible=es[0].isIntersecting;
+      if(visible&&!started){started=true;if(calm){for(var k in HOME)cam[k]=HOME[k];}else{for(var k2 in intro)cam[k2]=intro[k2];fly(HOME,3400);}}
+      if(visible)wake();},{threshold:.2}).observe(box);}
+    else{visible=true;for(var k in HOME)cam[k]=HOME[k];wake();}
+    document.fonts&&document.fonts.ready.then(function(){if(calm&&visible)draw(performance.now());});
+    new MutationObserver(function(){if(calm&&visible)draw(performance.now());}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   })();
 
   // Scroll animations: headlines slam in, photos rise, lists cascade, stats count up.
