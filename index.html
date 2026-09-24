@@ -1886,7 +1886,8 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
           var lit=.58+.42*Math.max(0,.55*sd[4]-.83*sd[5]);
           out.push({q:q,z:(q[0][2]+q[1][2]+q[2][2]+q[3][2])/4+2,c:col,k:lit,b:b,side:sd,z0:z0,z1:z1,si:i});}
         if(C[2]>z1){var q2=quad([x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]);if(q2)out.push({q:q2,z:(q2[0][2]+q2[2][2])/2,c:topCol,k:1,b:b,top:1});}}
-      for(var i=0;i<list.length;i++){var b=list[i],k=b[5],g=rise(b,now);
+      var inRing=fightCam()>.9;
+      for(var i=0;i<list.length;i++){var b=list[i],k=b[5];if(inRing&&k!=='arena')continue;var g=rise(b,now);
         if(k==='b')boxF(b,b[6],[b[6][0]*.62+22,b[6][1]*.62+20,b[6][2]*.62+26],0,g);
         else if(k==='leg')boxF(b,[70,52,40],[70,52,40],b[7],g);
         else if(k==='tank'){boxF(b,[110,72,46],[84,56,38],b[7],g);if(g>=1){var cx=(b[0]+b[2])/2,cy=(b[1]+b[3])/2,zt=b[7]+b[4],ap=P(cx,cy,zt+2.6),c1=P(b[0],b[1],zt),c2=P(b[2],b[1],zt),c3=P(b[2],b[3],zt),c4=P(b[0],b[3],zt);if(ap&&c1&&c2&&c3&&c4)out.push({cap:[ap,c1,c2,c3,c4],z:ap[2]-.5,b:b});}}
@@ -1904,7 +1905,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
         else if(k==='hwall')boxF(b,[196,192,184],[214,210,202],0,g);
         else if(k==='hpole')boxF(b,[60,60,66],[60,60,66],0,g);
         else if(k==='hoop')boxF(b,[236,236,236],[246,246,246],b[6],g);}
-      { // the 4 train on the el, the Bx9 on Kingsbridge Rd
+      if(!inRing){ // the 4 train on the el, the Bx9 on Kingsbridge Rd
         var ty=((s*34)%1100)-550;
         LIGHTS.length=0;
         for(var c=0;c<6;c++){var y0=ty-c*19;if(y0<-470||y0>470)continue;boxF([-4,y0-17,4,y0,3.4],[196,204,212],[220,226,232],13);if(c===0)LIGHTS.push([0,y0+.5,15,'#FFF4D6',16]);}
@@ -1914,7 +1915,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
         for(var ci=0;ci<TRAFFIC.length;ci++){var tr=TRAFFIC[ci],L0=tr.len,pos=((s*tr.v+tr.o)%L0+L0)%L0,x=tr.x0+(tr.x1-tr.x0)*pos/L0,y=tr.y0+(tr.y1-tr.y0)*pos/L0,dx=(tr.x1-tr.x0)/L0,dy=(tr.y1-tr.y0)/L0,hl=2.4,hw=1;
           boxF([x-Math.abs(dx)*hl-Math.abs(dy)*hw,y-Math.abs(dy)*hl-Math.abs(dx)*hw,x+Math.abs(dx)*hl+Math.abs(dy)*hw,y+Math.abs(dy)*hl+Math.abs(dx)*hw,1.5],tr.c,[tr.c[0]*.8+30,tr.c[1]*.8+30,tr.c[2]*.8+30]);
           LIGHTS.push([x+dx*2.6,y+dy*2.6,.8,'#FFF6DA',4.5]);LIGHTS.push([x-dx*2.6,y-dy*2.6,.8,'#FF2A2A',3.2]);}}
-      streetExtras(s,out,boxF,now);
+      if(!inRing)streetExtras(s,out,boxF,now);else{BULBS.length=0;LIGHTS.length=0;}
       out.sort(function(a,b){return b.z-a.z;});return out;}
 
     // ---------- draw ----------
@@ -1925,7 +1926,9 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
       if(shk)ctx.translate((Math.random()-.5)*2*shk,(Math.random()-.5)*2*shk);
       // dusk sky and a warm horizon, then the ground
       var g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#1d1238');g.addColorStop(.28,'#4a1f4a');g.addColorStop(.46,'#8a3a3a');g.addColorStop(.6,'#22182c');g.addColorStop(1,'#121119');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-      ground(-640,-540,840,540,'#17161f',120);
+      var inRing=fightCam()>.9;
+      ground(-640,-540,840,540,'#17161f',inRing?360:120);
+      if(!inRing){
       for(i=0;i<PARKS.length;i++){var p=PARKS[i];ground(p[0],p[1],p[2],p[3],'#173a24');}
       ground(22,16.5,50,46,'#24502a');ground(32,16.5,34.5,23.8,'#7a6040');ground(29,-139,59,-122,'#1f4e8c');ground(30,-138,58,-123,'#c65a2e');
       for(i=0;i<R.length;i++){var r=R[i];ground(r[0],r[1],r[2],r[3],i===0?'#2a2733':'#23222c');}
@@ -1942,6 +1945,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
         var c=[],k;for(k=0;k<=16;k++){var a=k/16*6.283;c.push([44+Math.cos(a)*1.8,-130.5+Math.sin(a)*1.8]);}Ln(c);
         Ln([[30,-133],[35.8,-133],[35.8,-128],[30,-128]]);Ln([[58,-133],[52.2,-133],[52.2,-128],[58,-128]]);
         [[30.6,1],[57.4,-1]].forEach(function(hb){var a2=[];for(var k=0;k<=12;k++){var t=-1.3+2.6*k/12;a2.push([hb[0]+hb[1]*Math.cos(t)*6.7,-130.5+Math.sin(t)*6.7]);}Ln(a2);});})();
+      }
       // walking route
       if(route){var rt=ROUTES[route],pts=[];for(i=0;i<rt.pts.length-1;i++){var A=rt.pts[i],Bp=rt.pts[i+1],n=Math.max(1,Math.ceil(Math.hypot(Bp[0]-A[0],Bp[1]-A[1])/20));
           for(var j=0;j<=n;j++){var pp=P(A[0]+(Bp[0]-A[0])*j/n,A[1]+(Bp[1]-A[1])*j/n,.5);if(pp)pts.push(pp);}}
@@ -1949,8 +1953,8 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
           ctx.setLineDash([2,9]);ctx.lineDashOffset=calm?0:-s*28;ctx.lineWidth=Math.max(3,4.2*F/cam.dist*.9);ctx.strokeStyle='#FFE066';ctx.stroke();ctx.setLineDash([]);}}
       // street lamps: pools of warm light on the pavement
       ctx.globalCompositeOperation='lighter';
-      for(i=0;i<LAMPS.length;i++)glow(LAMPS[i][0],LAMPS[i][1],.5,9,'rgba(255,170,70,.9)',.55);
-      for(i=0;i<PARK_LAMPS.length;i++)glow(PARK_LAMPS[i][0],PARK_LAMPS[i][1],.5,8,'rgba(170,255,190,.8)',.45);
+      if(!inRing)for(i=0;i<LAMPS.length;i++)glow(LAMPS[i][0],LAMPS[i][1],.5,9,'rgba(255,170,70,.9)',.55);
+      if(!inRing)for(i=0;i<PARK_LAMPS.length;i++)glow(PARK_LAMPS[i][0],PARK_LAMPS[i][1],.5,8,'rgba(170,255,190,.8)',.45);
       var gc0=P((GYM[0]+GYM[2])/2,(GYM[1]+GYM[3])/2,0);if(gc0)glow(AX,AY,0,110,'rgba(255,190,0,.9)',.55+(calm?0:.15*Math.sin(s*2.4)));
       ctx.globalCompositeOperation='source-over';
       // pulse ring
