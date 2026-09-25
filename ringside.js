@@ -169,14 +169,16 @@ function bindHead(sk,i){return new THREE.Vector3().setFromMatrixPosition(sk.bone
 function isMH(root){var y=false;root.traverse(function(o){if(o.isSkinnedMesh&&o.geometry.attributes._zone)y=true;});return y;}
 function dressMH(o,look){var g=o.geometry=o.geometry.clone(),pos=g.attributes.position,si=g.attributes.skinIndex,sw=g.attributes.skinWeight,sk=o.skeleton,bones=sk.bones,n=pos.count,
     cols=new Float32Array(n*3),c=new THREE.Color(),t=new THREE.Color(),mk=g.attributes._mask,zn=g.attributes._zone,ref=!!look.shirt;
+  if(o.morphTargetInfluences&&o.morphTargetInfluences.length)o.morphTargetInfluences[0]=ref?1:0; // fighters: the sculpted build; the referee keeps his own
   if(!zn){ // the shorts: satin, with a contrasting waistband and hem (the referee wears trousers instead)
     if(ref){o.visible=false;return;}
     for(var i=0;i<n;i++){c.set(look.shorts);t.set(look.trim);c.lerp(t,Math.max(mk.getX(i),mk.getY(i)));cols[i*3]=c.r;cols[i*3+1]=c.g;cols[i*3+2]=c.b;}
-    g.setAttribute('color',new THREE.BufferAttribute(cols,3));o.material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.42,metalness:.05,side:THREE.DoubleSide});return;}
+    g.setAttribute('color',new THREE.BufferAttribute(cols,3));o.material=shortsMaterial(look.shorts,look.trim);return;}
   var idx={};bones.forEach(function(b,k){idx[b.name.replace('DEF-','').replace(/\./g,'')]=k;});
   var ua={},arm={};['L','R'].forEach(function(s){var a=bindHead(sk,idx['upper_arm'+s]),e=bindHead(sk,idx['forearm'+s]);ua[s]=a;arm[s]=e.clone().sub(a);});
   var neckY=bindHead(sk,idx.neck).y,skin=new THREE.Color(look.skin),dark=skin.clone().multiplyScalar(.62),lip=skin.clone().lerp(new THREE.Color('#7a2e2a'),.35).multiplyScalar(.82),v=new THREE.Vector3();
-  for(i=0;i<n;i++){var nm=bones[domBone(si,sw,i)].name,y=pos.getY(i),eye=zn.getX(i);
+  var mats=new Float32Array(n); // fighters: 0 skin, 1 knit shin guards, 2 hair, 3 under the gloves, 4 under the shorts, 5 eyes
+  for(i=0;i<n;i++){var nm=bones[domBone(si,sw,i)].name,y=pos.getY(i),eye=zn.getX(i),mt=0;
     c.copy(skin);
     if(ref){ // referee: black short-sleeved shirt, black trousers and shoes, black gloves
       v.fromBufferAttribute(pos,i);var sd=nm.slice(-1),up=/upper_arm/.test(nm)?v.clone().sub(ua[sd]).dot(arm[sd])/arm[sd].lengthSq():-1;
@@ -185,19 +187,78 @@ function dressMH(o,look){var g=o.geometry=o.geometry.clone(),pos=g.attributes.po
       else if(/hips|thigh|shin/.test(nm))c.set(look.pants);
       else if(/spine|shoulder/.test(nm)||(/neck/.test(nm)&&y<neckY+.015)||(/upper_arm/.test(nm)&&up<.55))c.set(look.shirt);}
     else{
-      if(/hand/.test(nm))c.set(look.glove);
-      else if(/shin/.test(nm)&&y>.1&&y<.5)c.set(look.gear);
-      else if(/foot|toe/.test(nm)&&y>.05)c.set(look.gear);
-      var us=zn.getY(i);if(us>0){t.set(look.shorts);c.lerp(t,us);}}
+      if(/hand/.test(nm)){c.set(look.glove);mt=3;}
+      else if(/shin/.test(nm)&&y>.1&&y<.5){c.set(look.gear);mt=1;}
+      else if(/foot|toe/.test(nm)&&y>.05){c.set(look.gear);mt=1;}
+      var us=zn.getY(i);if(us>0){t.set(look.trim);c.lerp(t,Math.min(1,us*2));if(us>.5){t.set(look.shorts);c.lerp(t,(us-.5)*2);}if(us>.3)mt=4;}
+      if(mk.getX(i)>.5)mt=2;if(eye>0)mt=5;}
+    mats[i]=mt;
     t.set(look.head);c.lerp(t,mk.getX(i)*.96);            // short hair
     c.lerp(t,mk.getY(i)*.8);                               // brows
     var cloth=ref&&c.getHex()!==skin.getHex()&&mk.getX(i)<.01;
     c.lerp(lip,mk.getZ(i)*.7);if(!cloth)c.lerp(dark,mk.getW(i)*.55); // lips, nipples (not through the referee's shirt)
     if(eye>0)c.set(eye>.75?'#1d130d':'#d8d0c3');
-    c.multiplyScalar(1-(cloth?.12:.42)*zn.getZ(i));          // creases: abs, pecs, armpits, eye sockets
+    c.multiplyScalar(ref?1-(cloth?.12:.42)*zn.getW(i):1-.52*zn.getZ(i)); // creases and the hollows between muscle groups (referee: as before)
     cols[i*3]=c.r;cols[i*3+1]=c.g;cols[i*3+2]=c.b;}
   g.setAttribute('color',new THREE.BufferAttribute(cols,3));
-  o.material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:ref?.78:.5,metalness:0});}
+  if(ref){o.material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.78,metalness:0});return;}
+  g.setAttribute('lrMat',new THREE.BufferAttribute(mats,1));o.material=skinMaterial();}
+// ---------- premium fighter materials (fighters only; the arena and referee keep their look)
+// shared GLSL: value noise, a bump that works from any height function (no textures, no UVs), and a fade that drops detail finer than a pixel
+var LR_GLSL=[
+ 'varying vec3 vB;varying vec3 vBN;',
+ 'float lrH(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}',
+ 'float lrN(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);',
+ ' return mix(mix(mix(lrH(i),lrH(i+vec3(1,0,0)),f.x),mix(lrH(i+vec3(0,1,0)),lrH(i+vec3(1,1,0)),f.x),f.y),',
+ '  mix(mix(lrH(i+vec3(0,0,1)),lrH(i+vec3(1,0,1)),f.x),mix(lrH(i+vec3(0,1,1)),lrH(i+vec3(1,1,1)),f.x),f.y),f.z);}',
+ 'float lrFade(float fq){return 1.0-smoothstep(.25,.8,length(fwidth(vB))*fq);}',
+ 'vec3 lrBump(vec3 sp,vec3 sn,float h,float fd){vec3 sx=dFdx(sp),sy=dFdy(sp),r1=cross(sy,sn),r2=cross(sn,sx);float det=dot(sx,r1)*fd;',
+ ' vec2 d=vec2(dFdx(h),dFdy(h));vec3 g=sign(det)*(d.x*r1+d.y*r2);return normalize(abs(det)*sn-g);}',
+ // cool rim on the shoulders, arms and back, a soft fill toward the camera for faces and torsos
+ 'vec3 lrRimFill(vec3 N,vec3 alb,float rimK,float fillK){vec3 V=normalize(vViewPosition);float nv=clamp(dot(N,V),0.0,1.0);',
+ ' float rim=pow(1.0-nv,3.5)*(.4+.6*clamp(N.y+.35,0.0,1.0));float front=smoothstep(-.25,.55,normalize(vBN).z);',
+ ' return vec3(.76,.83,1.0)*rim*rimK+alb*vec3(1.0,.9,.8)*pow(nv,1.5)*fillK*front;}'].join('\n');
+function lrInject(m,key,vert,frag){var prev=m.onBeforeCompile;
+  m.onBeforeCompile=function(sh){sh.vertexShader=vert.attr+'\nvarying vec3 vB;varying vec3 vBN;\n'+sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvB=position;vBN=normal;'+(vert.body||''));
+    var f=sh.fragmentShader.replace('void main() {',LR_GLSL+'\n'+(frag.pars||'')+'\nvoid main() {');
+    ['color','roughness','normal','lights','output'].forEach(function(k){if(frag[k]){var tag={color:'#include <color_fragment>',roughness:'#include <roughnessmap_fragment>',normal:'#include <normal_fragment_maps>',lights:'#include <lights_physical_fragment>',output:'#include <output_fragment>'}[k];
+      f=k==='output'?f.replace(tag,frag[k]+'\n'+tag):f.replace(tag,tag+'\n'+frag[k]);}});
+    sh.fragmentShader=f;if(frag.uniforms)for(var u in frag.uniforms)sh.uniforms[u]=frag.uniforms[u];};
+  m.customProgramCacheKey=function(){return key;};return m;}
+// skin (with knit shin guards and short hair on the same mesh, told apart by a per-vertex material id): fine pores and soft unevenness,
+// slight colour variation, a light sweat sheen in patches, soft subsurface warmth, the rim and the fill
+function skinMaterial(){var m=new THREE.MeshPhysicalMaterial({vertexColors:true,roughness:.56,metalness:0,clearcoat:.2,clearcoatRoughness:.4});
+  return lrInject(m,'lr-skin',{attr:'attribute float lrMat;varying float vMat;',body:'vMat=lrMat;'},{
+   pars:'varying float vMat;',
+   color:'float isSkin=1.0-step(.5,vMat),isKnit=step(.5,vMat)*(1.0-step(1.5,vMat)),isHair=step(1.5,vMat)*(1.0-step(2.5,vMat));'+
+         'diffuseColor.rgb*=1.0+(lrN(vB*22.0)-.5)*.1*isSkin+(lrN(vB*230.0)-.5)*.14*isKnit*lrFade(230.0);',
+   roughness:'roughnessFactor=isSkin*mix(.5,.64,lrN(vB*38.0))+isKnit*.86+isHair*.72+(1.0-isSkin-isKnit-isHair)*roughnessFactor;',
+   normal:'{float h=isSkin*((lrN(vB*260.0)-.5)*.0003*lrFade(260.0)+(lrN(vB*70.0+3.1)-.5)*.0007*lrFade(70.0))'+
+          '+isKnit*(sin(vB.y*1500.0+lrN(vB*160.0)*2.5)*.00035*lrFade(240.0)+(lrN(vB*320.0)-.5)*.0004*lrFade(320.0))'+
+          '+isHair*(lrN(vB*vec3(900.0,260.0,900.0))-.5)*.0009*lrFade(600.0);normal=lrBump(-vViewPosition,normal,h,faceDirection);}',
+   lights:'#ifdef USE_CLEARCOAT\nmaterial.clearcoat*=isSkin*(.3+.7*smoothstep(.42,.72,lrN(vB*8.0+2.0)));\n#endif',
+   output:'{float lum=dot(outgoingLight,vec3(.299,.587,.114));vec3 alb=diffuseColor.rgb;'+
+          'outgoingLight+=alb*vec3(.5,.16,.07)*.55*isSkin*smoothstep(.0,.2,lum)*(1.0-smoothstep(.2,.8,lum));'+
+          'outgoingLight+=lrRimFill(normalize(normal),alb,.3,.3);}'});}
+// satin Muay Thai shorts: sheen, folds that deepen toward the hem, a ribbed elastic waistband and stitching in the trim colour
+function shortsMaterial(shorts,trim){var sc=new THREE.Color(shorts),m=new THREE.MeshPhysicalMaterial({vertexColors:true,roughness:.46,metalness:0,side:THREE.DoubleSide,
+    sheen:1,sheenRoughness:.38,sheenColor:sc.clone().lerp(new THREE.Color('#fff4e6'),.14)}),tr={value:new THREE.Color(trim)};
+  return lrInject(m,'lr-shorts',{attr:'attribute vec4 _mask;varying vec4 vMask;',body:'vMask=_mask;'},{
+   pars:'varying vec4 vMask;uniform vec3 uTrim;',uniforms:{uTrim:tr},
+   color:'float th=atan(vB.z,vB.x-sign(vB.x)*.1),down=clamp((1.035-vB.y)/.335,0.0,1.0);'+
+         'float st=smoothstep(.0,.025,vMask.x)*(1.0-smoothstep(.025,.06,vMask.x))+smoothstep(.0,.03,vMask.y)*(1.0-smoothstep(.03,.08,vMask.y));'+
+         'float dash=smoothstep(.35,.45,fract(th*22.0+vB.y*3.0))*(1.0-smoothstep(.85,.95,fract(th*22.0+vB.y*3.0)));diffuseColor.rgb=mix(diffuseColor.rgb,uTrim,st*dash*.55);',
+   normal:'{float h=sin(th*6.0+lrN(vB*10.0)*4.0)*.0055*down*down+(lrN(vB*28.0)-.5)*.0012+sin(vB.y*760.0)*.0005*vMask.x*lrFade(250.0)-st*dash*.0004;'+
+          'normal=lrBump(-vViewPosition,normal,h,faceDirection);}',
+   output:'outgoingLight+=lrRimFill(normalize(normal),diffuseColor.rgb,.22,.12);'});}
+// leather gloves: grain, a darker piping seam around the glove and along the thumb, glossy but not plastic
+function leatherMaterial(col){var m=new THREE.MeshPhysicalMaterial({color:col,roughness:.44,metalness:0,clearcoat:.55,clearcoatRoughness:.24});
+  return lrInject(m,'lr-leather',{attr:'attribute float seam;varying float vSeam;',body:'vSeam=seam;'},{
+   pars:'varying float vSeam;',
+   color:'float sm=smoothstep(.55,1.0,vSeam);diffuseColor.rgb*=1.0-.38*sm+(lrN(vB*420.0)-.5)*.06*lrFade(420.0);',
+   roughness:'roughnessFactor=mix(roughnessFactor,.62,sm);',
+   normal:'{float h=(lrN(vB*420.0)-.5)*.00022*lrFade(420.0)+(lrN(vB*90.0)-.5)*.0005-sm*.0009;normal=lrBump(-vViewPosition,normal,h,faceDirection);}',
+   output:'outgoingLight+=lrRimFill(normalize(normal),diffuseColor.rgb,.3,.12);'});}
 function dress(root,look){root.traverse(function(o){if(!o.isSkinnedMesh)return;o.castShadow=true;o.frustumCulled=false;
   if(o.geometry.attributes._zone||o.geometry.attributes._mask){dressMH(o,look);return;}
   var g=o.geometry=o.geometry.clone(),pos=g.attributes.position,si=g.attributes.skinIndex,sw=g.attributes.skinWeight,bones=o.skeleton.bones,cols=new Float32Array(pos.count*3),c=new THREE.Color();
@@ -227,7 +288,27 @@ function handAxis(root,side){var dir=null;root.traverse(function(o){if(dir||!o.i
   var h=bindHead(sk,k),c=new THREE.Vector3(),m=0,v=new THREE.Vector3();
   for(var i=0;i<pos.count;i++)if(domBone(si,sw,i)===k){c.add(v.fromBufferAttribute(pos,i));m++;}
   if(m)dir=c.multiplyScalar(1/m).sub(h);});return dir;}
+// a boxing glove in its own frame (y along the fingers, x toward the thumb): a padded fist that narrows into the wrist, a tucked thumb,
+// a cuff with a strap; 'seam' marks the piping around the glove's outline and along the thumb
+function gloveGeo(){var parts=[],R=.074;
+  function add(geo,fn,seamFn){var p=geo.attributes.position,v=new THREE.Vector3(),sm=new Float32Array(p.count);
+    for(var i=0;i<p.count;i++){v.fromBufferAttribute(p,i);fn(v);p.setXYZ(i,v.x,v.y,v.z);sm[i]=seamFn?seamFn(v):0;}
+    geo.setAttribute('seam',new THREE.BufferAttribute(sm,1));geo.deleteAttribute('uv');geo.computeVertexNormals();parts.push(geo);}
+  add(new THREE.SphereGeometry(1,48,32),function(v){var y=v.y;v.y*=1.3;var w=1-.26*THREE.MathUtils.smoothstep(-y,.15,1.0);v.x*=w*1.02;v.z*=w*.97;
+      if(v.z>0)v.z*=1.06;v.multiplyScalar(R);},function(v){return 1-THREE.MathUtils.smoothstep(Math.abs(v.z)/R,.0,.06);});
+  add(new THREE.CapsuleGeometry(.3,.62,8,20),function(v){v.applyAxisAngle(new THREE.Vector3(0,0,1),-.2);v.x+=.8;v.y+=.02;v.z+=.2;v.multiplyScalar(R);},
+      function(v){return 1-THREE.MathUtils.smoothstep(Math.abs(v.x/R-.62),.0,.05);});
+  add(new THREE.CylinderGeometry(.74,.8,1.4,40,1,true),function(v){v.y-=1.62;v.multiplyScalar(R);},function(v){var d=Math.abs(v.y/R+.93);return 1-THREE.MathUtils.smoothstep(d,.0,.05);});
+  add(new THREE.CylinderGeometry(.83,.83,.5,40,1,true),function(v){v.y-=1.7;v.multiplyScalar(R);},function(v){var d=Math.min(Math.abs(v.y/R+1.45),Math.abs(v.y/R+1.95));return 1-THREE.MathUtils.smoothstep(d,.0,.04);});
+  return parts;}
+var GLOVE_GEO=null;
 function gloves(bn,col,root){var out={};['hand.L','hand.R'].forEach(function(n){var h=bn[n];if(!h)return;var s=new THREE.Vector3();h.getWorldScale(s);
+  var G=h.userData&&h.userData.glove;
+  if(G){if(!GLOVE_GEO)GLOVE_GEO=gloveGeo();var mat=leatherMaterial(col),grp=new THREE.Group(),body=null;
+    GLOVE_GEO.forEach(function(geo,k){var ms=new THREE.Mesh(geo,mat);ms.castShadow=true;grp.add(ms);if(!k)body=ms;});
+    var Y=new THREE.Vector3().fromArray(G.axis),X=new THREE.Vector3().fromArray(G.thumb),Z=new THREE.Vector3().crossVectors(X,Y).normalize();X.crossVectors(Y,Z);
+    grp.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(X,Y,Z));grp.position.copy(Y).multiplyScalar(G.len*.92);h.add(grp);
+    out[n.slice(-1)]=body;return;}
   var ax=root?handAxis(root,n.slice(-1)):null;
   var gl=new THREE.Mesh(new THREE.SphereGeometry(.078,24,18),new THREE.MeshStandardMaterial({color:col,roughness:.32}));gl.castShadow=true;h.add(gl);
   var cuff=new THREE.Mesh(new THREE.CylinderGeometry(.05,.054,.08,18),new THREE.MeshStandardMaterial({color:col,roughness:.4}));h.add(cuff);
@@ -462,7 +543,7 @@ function init(gltf){
   gltf.animations.forEach(function(c){clips[c.name]=c;});
   reflashFn=build();
   F.push(makeFighter(gltf,LOOKS.a,0));F.push(makeFighter(gltf,LOOKS.b,1.7));
-  var r=THREE.SkeletonUtils.clone(gltf.scene);dress(r,LOOKS.r);scene.add(r);var rmh=isMH(r);decal(r,boneMap(r),'spine.003','ref',rmh?.2:.24,rmh?.2:.24,0,1.3,rmh?-.096:-.152,true);r.position.set(1.2,CAN,-1.6);REFR={root:r,mixer:new THREE.AnimationMixer(r)};REFR.mixer.clipAction(clips.Idle_Loop).play();
+  var r=THREE.SkeletonUtils.clone(gltf.scene);dress(r,LOOKS.r);scene.add(r);var rmh=isMH(r);decal(r,boneMap(r),'spine.003','ref',rmh?.2:.24,rmh?.2:.24,0,1.3,rmh?-.086:-.152,true);r.position.set(1.2,CAN,-1.6);REFR={root:r,mixer:new THREE.AnimationMixer(r)};REFR.mixer.clipAction(clips.Idle_Loop).play();
   names();api.ready=true;}
 var fontsOk=document.fonts&&document.fonts.load?Promise.all([document.fonts.load("400 40px Anton"),document.fonts.load("700 40px 'Barlow Condensed'")]).catch(function(){}):Promise.resolve();
 // the crowned lion for the ring canvas and apron: the same art as the site's hero and footer (usually already cached). Without it the ring keeps its drawn lion.
