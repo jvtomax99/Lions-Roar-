@@ -1593,6 +1593,16 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
       F=H/(2*Math.tan(17*Math.PI/180))*(1+ZPUNCH);}
     function span(){return Math.max(1,1.45/(W/H));}
     function fightCam(){var near=1-sm((Math.hypot(cam.tx-AX,cam.ty-AY)-10)/10);return near*Math.max(0,Math.min(1,(70-cam.dist)/35));}
+    // Ringside fight (ringside.js): a 3D fight with motion-captured Muay Thai, loaded on demand. It follows this map's camera
+    // and fades in over the map as the camera comes into the arena; if it can't load, the drawn fight below stays in its place.
+    var NEWF=null,ringLoading=false,ringFailed=false;
+    function ringOn(){return !!(NEWF&&NEWF.ready);}
+    function ringWant(){return ringOn()?sm((fightCam()-.3)/.5):0;}
+    function loadRing(){if(ringLoading||calm)return;ringLoading=true;
+      var cdn='https://cdn.jsdelivr.net/npm/three@0.147.0/',srcs=window.THREE?[]:[cdn+'build/three.min.js'];srcs.push(cdn+'examples/js/loaders/GLTFLoader.js',cdn+'examples/js/utils/SkeletonUtils.js','ringside.js');
+      (function next(i){if(i>=srcs.length){try{NEWF=window.LRRing?window.LRRing.mount(box,{AX:AX,AY:AY,K:FS,L:L,canvas:cv,glb:'ringside.glb',onfail:function(){NEWF=null;ringFailed=true;}}):null;}catch(e){NEWF=null;}if(!NEWF)ringFailed=true;
+          if(NEWF)NEWF.resize(W,H,dpr);wake();return;}
+        var sc=document.createElement('script');sc.src=srcs[i];sc.onload=function(){next(i+1);};sc.onerror=function(){ringFailed=true;};document.head.appendChild(sc);})(0);}
     function P(x,y,z){var dx=x-C[0],dy=y-C[1],dz=z-C[2],zc=dx*fx+dy*fy+dz*fz;if(zc<5)return null;
       var xc=dx*rx+dy*ry,yc=dx*ux+dy*uy+dz*uz;return [W/2+xc*F/zc,H*.54-yc*F/zc,zc];}
     function poly(pts,fill,stroke){ctx.beginPath();for(var i=0;i<pts.length;i++){if(i)ctx.lineTo(pts[i][0],pts[i][1]);else ctx.moveTo(pts[i][0],pts[i][1]);}ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill();}if(stroke){ctx.strokeStyle=stroke;ctx.stroke();}}
@@ -1971,9 +1981,9 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
           for(var q=0;q<8;q++){var pk=pq-q*.028;if(pk<0)break;var S2=stance(tt-q*.028*(M.t1-M.t0),E2.att?.37:0);attack(S2,M.m,pk);tp.push(toWorld(bse,phi,rig(S2)[JN[M.m]]));}
           TRAIL={pts:tp,col:E2.att?'255,110,90':'255,214,90'};}}
       var mn=1e9,mxv=-1e9,pmn=null,pmx=null;[[baseA,phiA,JA],[baseB,phiB,JB]].forEach(function(f){for(var k in f[2]){if(k==='fwd')continue;var w=toWorld(f[0],f[1],f[2][k]),dd=w[0]*rx+w[1]*ry;if(dd<mn){mn=dd;pmn=w;}if(dd>mxv){mxv=dd;pmx=w;}}});
-      if(pmn)FCAM={x:(pmn[0]+pmx[0])/2,y:(pmn[1]+pmx[1])/2,ext:mxv-mn};
+      if(pmn&&!ringOn())FCAM={x:(pmn[0]+pmx[0])/2,y:(pmn[1]+pmx[1])/2,ext:mxv-mn};
       BLY=tt>=TKO?toWorld(baseB,phiB,JB.pel):null;
-      [[baseA,phiA,JA,CORNER_A,0],[baseB,phiB,JB,CORNER_B,1],[rbase,rphi,rig(RS0),REF,2]].forEach(function(f){
+      if(!ringOn()||NEWF.alpha<.3)[[baseA,phiA,JA,CORNER_A,0],[baseB,phiB,JB,CORNER_B,1],[rbase,rphi,rig(RS0),REF,2]].forEach(function(f){
         var hp2=P(f[0][0],f[0][1],RF+FS*.9),sp=P(f[0][0],f[0][1],RF+.03);if(!hp2)return;
         if(sp)out.push({z:hp2[2]+FS*.9,draw:function(){var r=.42*FS*F/sp[2];ctx.fillStyle='rgba(0,0,0,.38)';ctx.beginPath();ctx.ellipse(sp[0],sp[1],r,r*Math.max(.12,Math.sin(cam.pitch*Math.PI/180)),0,0,6.283);ctx.fill();}});
         out.push({z:hp2[2],draw:function(){drawBody(f[0],f[1],f[2],f[3]);}});});}
@@ -2026,10 +2036,10 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
     // ---------- draw ----------
     var ZPUNCH=0;
     function draw(now){
-      ZPUNCH=0;if(!calm&&fightCam()>0){for(var zp=0;zp<EV.length;zp++){var ze=EV[zp],za=CUR_TT-ze.t;if(za<0)break;if(ze.land&&za<.35)ZPUNCH=Math.max(ZPUNCH,(ze===KOEV?.09:/kick|cross|elbow|knee/.test(ze.m)?.045:.025)*Math.sin(Math.PI*Math.min(1,za/.35))*fightCam());}}
+      ZPUNCH=0;if(!calm&&!ringOn()&&fightCam()>0){for(var zp=0;zp<EV.length;zp++){var ze=EV[zp],za=CUR_TT-ze.t;if(za<0)break;if(ze.land&&za<.35)ZPUNCH=Math.max(ZPUNCH,(ze===KOEV?.09:/kick|cross|elbow|knee/.test(ze.m)?.045:.025)*Math.sin(Math.PI*Math.min(1,za/.35))*fightCam());}}
       setup();ctx.setTransform(dpr,0,0,dpr,0,0);var i,s=(now-t0)/1000;NEON.length=0;
       // screen shake on heavy shots, hardest on the knockout
-      var shk=0;if(!calm&&fightCam()>0){for(i=0;i<EV.length;i++){var e0=EV[i],a0=CUR_TT-e0.t;if(a0<0)break;if(a0<.3&&e0.land)shk=Math.max(shk,(e0===KOEV?14:/kick|cross|elbow|knee/.test(e0.m)?4:2)*(1-a0/.3));}}
+      var shk=0;if(!calm&&!ringOn()&&fightCam()>0){for(i=0;i<EV.length;i++){var e0=EV[i],a0=CUR_TT-e0.t;if(a0<0)break;if(a0<.3&&e0.land)shk=Math.max(shk,(e0===KOEV?14:/kick|cross|elbow|knee/.test(e0.m)?4:2)*(1-a0/.3));}}
       if(shk)ctx.translate((Math.random()-.5)*2*shk,(Math.random()-.5)*2*shk);
       // dusk sky and a warm horizon, then the ground
       var g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#1d1238');g.addColorStop(.28,'#4a1f4a');g.addColorStop(.46,'#8a3a3a');g.addColorStop(.6,'#22182c');g.addColorStop(1,'#121119');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
@@ -2135,10 +2145,10 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
       // vignette
       var vg=ctx.createRadialGradient(W/2,H*.55,Math.min(W,H)*.35,W/2,H*.55,Math.max(W,H)*.8);vg.addColorStop(0,'rgba(10,8,18,0)');vg.addColorStop(1,'rgba(10,8,18,.55)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
       labels(s);
-      ctx.setTransform(dpr,0,0,dpr,0,0);var fc2=fightCam();if(fc2>.02)drawHUD(fc2);}
+      ctx.setTransform(dpr,0,0,dpr,0,0);var fc2=fightCam();if(fc2>.02&&!ringOn())drawHUD(fc2);}
 
     // ---------- fight effects: motion trails, hit sparks, block sparks, sweat, the knockout flash and speed lines, dust ----------
-    function drawFX(){var tt=CUR_TT,fcv=fightCam(),i;if(fcv<=0)return;
+    function drawFX(){var tt=CUR_TT,fcv=fightCam(),i;if(fcv<=0||(ringOn()&&NEWF.alpha>.3))return;
       if(TRAIL&&!calm){var tp=[];TRAIL.pts.forEach(function(w){var p=P(w[0],w[1],w[2]);if(p)tp.push(p);});ctx.globalCompositeOperation='lighter';ctx.lineCap='round';
         for(i=1;i<tp.length;i++){var fr=1-i/tp.length;ctx.strokeStyle='rgba('+TRAIL.col+','+(.6*fr).toFixed(3)+')';ctx.lineWidth=Math.max(1,.13*FS*F/tp[i][2]*fr);ctx.beginPath();ctx.moveTo(tp[i-1][0],tp[i-1][1]);ctx.lineTo(tp[i][0],tp[i][1]);ctx.stroke();}
         ctx.globalCompositeOperation='source-over';}
@@ -2248,15 +2258,17 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
     function fly(to,ms,done){if(calm){for(var k in to)cam[k]=to[k];wake();if(done)done();return;}anim={from:{tx:cam.tx,ty:cam.ty,tz:cam.tz||0,yaw:cam.yaw,pitch:cam.pitch,dist:cam.dist},to:to,t:performance.now(),ms:ms||1600,done:done};wake();}
     var HOME={tx:-70,ty:10,tz:0,yaw:-28,pitch:40,dist:700},RING={tx:AX,ty:AY,tz:4.4,yaw:-24,pitch:9,dist:15.5},lastN=0,touched=false,ringBtn=$('mapRing');
     function ringside(on){if(ringBtn)ringBtn.setAttribute('aria-pressed',on?'true':'false');}
-    if(ringBtn)ringBtn.addEventListener('click',function(){touched=true;var on=ringBtn.getAttribute('aria-pressed')!=='true';ringside(on);route=null;
+    if(ringBtn)ringBtn.addEventListener('click',function(){touched=true;loadRing();var on=ringBtn.getAttribute('aria-pressed')!=='true';ringside(on);route=null;
       document.querySelectorAll('.ways [data-route]').forEach(function(o){o.setAttribute('aria-pressed','false');});if(box.classList.contains('street'))street(false);if(on)FT.clock=-1.4;fly(on?RING:HOME,1500);});
     function frame(now){raf=0;if(!visible||box.classList.contains('street'))return;
       if(anim){var k=Math.min(1,(now-anim.t)/anim.ms),e=ease(k);for(var key in anim.to){var a=anim.from[key],b=anim.to[key];cam[key]=a+(b-a)*e;}if(k>=1){var dn=anim.done;anim=null;if(dn)dn();}}
       else if(!calm&&!drag&&idle){cam.yaw+=Math.sin(now/5200)*.018;}
       var dtR=lastN?Math.min(.1,(now-lastN)/1000):0;lastN=now;
+      if(ringOn()){var nf=NEWF.fcam();if(nf)FCAM=nf;}
       if(!anim&&!drag&&FCAM){var fcv=fightCam();if(fcv>0){var kq=Math.min(1,dtR*2.2)*fcv;cam.tx+=(FCAM.x-cam.tx)*kq;cam.ty+=(FCAM.y-cam.ty)*kq;
         var wantD=Math.max(RING.dist,FCAM.ext*1.3*F/(W*span()));cam.dist+=(wantD-cam.dist)*Math.min(1,dtR*1.5)*fcv;}}
-      if(now-last>(W<700?30:14)||anim){last=now;draw(now);}
+      if(now-last>(W<700?30:14)||anim){last=now;if(NEWF){setup();NEWF.update(now,{C:C.slice(),f:[fx,fy,fz],u:[ux,uy,uz],r:[rx,ry],F:F,W:W,H:H},ringWant());}
+        if(!ringOn()||NEWF.alpha<.999)draw(now);}
       if(!calm)raf=requestAnimationFrame(frame);}
     function wake(){if(!raf&&visible){if(calm){draw(performance.now());}else raf=requestAnimationFrame(frame);}}
     // zoom: + and - buttons, pinch on phones, pinch or ctrl+scroll on computers, and a tap zooms in on that spot; closer means a lower, street-level camera
@@ -2286,10 +2298,12 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
       if(box.classList.contains('street'))street(false);
       fly(same?HOME:ROUTES[id].cam,1500);
       if(window.innerWidth<1181&&!same){var r=box.getBoundingClientRect();if(r.top<0||r.bottom>window.innerHeight)box.scrollIntoView({behavior:calm?'auto':'smooth',block:'center'});}});});
-    resize();window.addEventListener('resize',function(){resize();if(calm)draw(performance.now());});
+    resize();window.addEventListener('resize',function(){resize();if(NEWF)NEWF.resize(W,H,dpr);if(calm)draw(performance.now());});
     var intro={tx:120,ty:40,tz:0,yaw:-80,pitch:78,dist:2300};
+    if('IntersectionObserver' in window){var pre=new IntersectionObserver(function(es){if(es[0].isIntersecting){loadRing();pre.disconnect();}},{rootMargin:'900px 0px'});pre.observe(box);}else loadRing();
     if('IntersectionObserver' in window){new IntersectionObserver(function(es){visible=es[0].isIntersecting;
-      if(visible&&!started){started=true;riseT=performance.now()+500;if(calm){for(var k in HOME)cam[k]=HOME[k];}else{for(var k2 in intro)cam[k2]=intro[k2];ringside(true);FT.clock=-3.4;fly(RING,3600,function(){setTimeout(function(){if(!touched){ringside(false);fly(HOME,2600);}},11000);});}}
+      if(visible&&!started){started=true;riseT=performance.now()+500;if(calm){for(var k in HOME)cam[k]=HOME[k];}else{for(var k2 in intro)cam[k2]=intro[k2];ringside(true);FT.clock=-3.4;fly(RING,3600,function(){var gone=false,waited=0,back=function(){if(gone||touched)return;gone=true;ringside(false);fly(HOME,2600);};
+        (function chk(){if(ringOn()){NEWF.onKO(function(){setTimeout(back,2800);});setTimeout(back,30000);}else if(!ringFailed&&!calm&&waited<8000){waited+=400;setTimeout(chk,400);}else setTimeout(back,Math.max(1000,11000-waited));})();});}}
       if(visible)wake();},{threshold:.2}).observe(box);}
     else{visible=true;for(var k in HOME)cam[k]=HOME[k];wake();}
     document.fonts&&document.fonts.ready.then(function(){if(calm&&visible)draw(performance.now());});
