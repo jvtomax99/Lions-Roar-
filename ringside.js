@@ -162,7 +162,44 @@ function cutStands(){var cx=camera.position.x,cz=camera.position.z,hd=Math.hypot
 var LOOKS={a:{skin:'#c68656',shorts:'#131315',trim:'#e0b030',gear:'#c01820',glove:'#c8171f',head:'#1b120c',emblem:'gold'},
            b:{skin:'#8d5436',shorts:'#131317',trim:'#ecebe6',gear:'#1f47bd',glove:'#1f47bd',head:'#0d0907',emblem:'white'},
            r:{skin:'#b78057',shirt:'#141416',pants:'#121215',head:'#2a2a2a',gloves:'#0c0c0e'}};
-var GET=['getX','getY','getZ','getW'];function dress(root,look){root.traverse(function(o){if(!o.isSkinnedMesh)return;o.castShadow=true;o.frustumCulled=false;
+var GET=['getX','getY','getZ','getW'];
+function domBone(si,sw,i){var best=0,bw=-1;for(var k=0;k<4;k++){var w=sw[GET[k]](i);if(w>bw){bw=w;best=si[GET[k]](i);}}return best;}
+function bindHead(sk,i){return new THREE.Vector3().setFromMatrixPosition(sk.boneInverses[i].clone().invert());}
+// the MakeHuman body: painted from masks baked into the model (hair, brows, lips, nipples, eyes, crease shading, the body under the shorts)
+function isMH(root){var y=false;root.traverse(function(o){if(o.isSkinnedMesh&&o.geometry.attributes._zone)y=true;});return y;}
+function dressMH(o,look){var g=o.geometry=o.geometry.clone(),pos=g.attributes.position,si=g.attributes.skinIndex,sw=g.attributes.skinWeight,sk=o.skeleton,bones=sk.bones,n=pos.count,
+    cols=new Float32Array(n*3),c=new THREE.Color(),t=new THREE.Color(),mk=g.attributes._mask,zn=g.attributes._zone,ref=!!look.shirt;
+  if(!zn){ // the shorts: satin, with a contrasting waistband and hem (the referee wears trousers instead)
+    if(ref){o.visible=false;return;}
+    for(var i=0;i<n;i++){c.set(look.shorts);t.set(look.trim);c.lerp(t,Math.max(mk.getX(i),mk.getY(i)));cols[i*3]=c.r;cols[i*3+1]=c.g;cols[i*3+2]=c.b;}
+    g.setAttribute('color',new THREE.BufferAttribute(cols,3));o.material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.42,metalness:.05,side:THREE.DoubleSide});return;}
+  var idx={};bones.forEach(function(b,k){idx[b.name.replace('DEF-','').replace(/\./g,'')]=k;});
+  var ua={},arm={};['L','R'].forEach(function(s){var a=bindHead(sk,idx['upper_arm'+s]),e=bindHead(sk,idx['forearm'+s]);ua[s]=a;arm[s]=e.clone().sub(a);});
+  var neckY=bindHead(sk,idx.neck).y,skin=new THREE.Color(look.skin),dark=skin.clone().multiplyScalar(.62),lip=skin.clone().lerp(new THREE.Color('#7a2e2a'),.35).multiplyScalar(.82),v=new THREE.Vector3();
+  for(i=0;i<n;i++){var nm=bones[domBone(si,sw,i)].name,y=pos.getY(i),eye=zn.getX(i);
+    c.copy(skin);
+    if(ref){ // referee: black short-sleeved shirt, black trousers and shoes, black gloves
+      v.fromBufferAttribute(pos,i);var sd=nm.slice(-1),up=/upper_arm/.test(nm)?v.clone().sub(ua[sd]).dot(arm[sd])/arm[sd].lengthSq():-1;
+      if(/hand/.test(nm))c.set(look.gloves);
+      else if(/foot|toe/.test(nm))c.set('#0b0b0d');
+      else if(/hips|thigh|shin/.test(nm))c.set(look.pants);
+      else if(/spine|shoulder/.test(nm)||(/neck/.test(nm)&&y<neckY+.015)||(/upper_arm/.test(nm)&&up<.55))c.set(look.shirt);}
+    else{
+      if(/hand/.test(nm))c.set(look.glove);
+      else if(/shin/.test(nm)&&y>.1&&y<.5)c.set(look.gear);
+      else if(/foot|toe/.test(nm)&&y>.05)c.set(look.gear);
+      var us=zn.getY(i);if(us>0){t.set(look.shorts);c.lerp(t,us);}}
+    t.set(look.head);c.lerp(t,mk.getX(i)*.96);            // short hair
+    c.lerp(t,mk.getY(i)*.8);                               // brows
+    var cloth=ref&&c.getHex()!==skin.getHex()&&mk.getX(i)<.01;
+    c.lerp(lip,mk.getZ(i)*.7);if(!cloth)c.lerp(dark,mk.getW(i)*.55); // lips, nipples (not through the referee's shirt)
+    if(eye>0)c.set(eye>.75?'#1d130d':'#d8d0c3');
+    c.multiplyScalar(1-(cloth?.12:.42)*zn.getZ(i));          // creases: abs, pecs, armpits, eye sockets
+    cols[i*3]=c.r;cols[i*3+1]=c.g;cols[i*3+2]=c.b;}
+  g.setAttribute('color',new THREE.BufferAttribute(cols,3));
+  o.material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:ref?.78:.5,metalness:0});}
+function dress(root,look){root.traverse(function(o){if(!o.isSkinnedMesh)return;o.castShadow=true;o.frustumCulled=false;
+  if(o.geometry.attributes._zone||o.geometry.attributes._mask){dressMH(o,look);return;}
   var g=o.geometry=o.geometry.clone(),pos=g.attributes.position,si=g.attributes.skinIndex,sw=g.attributes.skinWeight,bones=o.skeleton.bones,cols=new Float32Array(pos.count*3),c=new THREE.Color();
   for(var i=0;i<pos.count;i++){var best=0,bw=-1;for(var k=0;k<4;k++){var w=sw[GET[k]](i);if(w>bw){bw=w;best=si[GET[k]](i);}}
     var nm=bones[best].name,hgt=pos.getY(i),col;
@@ -183,9 +220,22 @@ var GET=['getX','getY','getZ','getW'];function dress(root,look){root.traverse(fu
   g.setAttribute('color',new THREE.BufferAttribute(cols,3));
   o.material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:look.shirt?.8:.46,metalness:0});});}
 function boneMap(root){var m={};root.traverse(function(o){if(!o.isBone)return;var k=o.name.replace('DEF-','');m[k]=o;m[k.replace(/([a-z_])([LR])$/,'$1.$2').replace(/spine(\d+)/,'spine.$1')]=o;});return m;}
-function gloves(bn,col){var out={};['hand.L','hand.R'].forEach(function(n){var h=bn[n];if(!h)return;var s=new THREE.Vector3();h.getWorldScale(s);
-  var gl=new THREE.Mesh(new THREE.SphereGeometry(.078,18,14),new THREE.MeshStandardMaterial({color:col,roughness:.32}));gl.scale.set(1/s.x,1.25/s.y,1.05/s.z);gl.position.set(0,.075/s.y,.012/s.z);gl.castShadow=true;h.add(gl);
-  var cuff=new THREE.Mesh(new THREE.CylinderGeometry(.052,.056,.07,14),new THREE.MeshStandardMaterial({color:col,roughness:.4}));cuff.scale.set(1/s.x,1/s.y,1/s.z);cuff.position.set(0,-.01/s.y,0);h.add(cuff);out[n.slice(-1)]=gl;});return out;}
+// on the MakeHuman body the hand bone rests unrotated, so the glove is laid along the hand itself (wrist to knuckles, found from the mesh)
+function handAxis(root,side){var dir=null;root.traverse(function(o){if(dir||!o.isSkinnedMesh||!o.geometry.attributes._zone)return;
+  var g=o.geometry,pos=g.attributes.position,si=g.attributes.skinIndex,sw=g.attributes.skinWeight,sk=o.skeleton,k=-1;
+  sk.bones.forEach(function(b,i){if(b.name.replace(/\./g,'')==='DEF-hand'+side)k=i;});if(k<0)return;
+  var h=bindHead(sk,k),c=new THREE.Vector3(),m=0,v=new THREE.Vector3();
+  for(var i=0;i<pos.count;i++)if(domBone(si,sw,i)===k){c.add(v.fromBufferAttribute(pos,i));m++;}
+  if(m)dir=c.multiplyScalar(1/m).sub(h);});return dir;}
+function gloves(bn,col,root){var out={};['hand.L','hand.R'].forEach(function(n){var h=bn[n];if(!h)return;var s=new THREE.Vector3();h.getWorldScale(s);
+  var ax=root?handAxis(root,n.slice(-1)):null;
+  var gl=new THREE.Mesh(new THREE.SphereGeometry(.078,24,18),new THREE.MeshStandardMaterial({color:col,roughness:.32}));gl.castShadow=true;h.add(gl);
+  var cuff=new THREE.Mesh(new THREE.CylinderGeometry(.05,.054,.08,18),new THREE.MeshStandardMaterial({color:col,roughness:.4}));h.add(cuff);
+  if(ax){var d=ax.clone().normalize(),q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),d);
+    gl.quaternion.copy(q);gl.scale.set(1,1.22,1.05);gl.position.copy(d).multiplyScalar(ax.length()*.95);
+    cuff.quaternion.copy(q);cuff.position.copy(d).multiplyScalar(-.015);}
+  else{gl.scale.set(1/s.x,1.25/s.y,1.05/s.z);gl.position.set(0,.075/s.y,.012/s.z);cuff.scale.set(1/s.x,1/s.y,1/s.z);cuff.position.set(0,-.01/s.y,0);}
+  out[n.slice(-1)]=gl;});return out;}
 // small printed emblems: the gym lion on the shorts and on the referee's back
 var DECALS={};
 function decalTex(kind){if(DECALS[kind])return DECALS[kind];return DECALS[kind]=tex(256,256,function(g,w,h){
@@ -202,9 +252,9 @@ function wp(b){return b.getWorldPosition(V3());}
 function dirTo(from,to){return to.clone().sub(from).normalize();}
 var KO_CLIPS={mx_ko:1,mx_ko2:1};
 function makeFighter(gltf,look,ph){
-  var root=THREE.SkeletonUtils.clone(gltf.scene);dress(root,look);scene.add(root);root.position.set(0,CAN,0);root.updateMatrixWorld(true);
-  var f={root:root,bn:boneMap(root),mixer:new THREE.AnimationMixer(root),act:{},fx:[],saved:[],o:0,v:0,lunge:0,turn:0,drop:0,hp:100,look:look,fwd:V3(1,0,0),ph:ph,dead:false};
-  f.glv=gloves(f.bn,look.glove);decal(root,f.bn,'hips',look.emblem,look.emblem==='white'?.15:.12,.12,0,.83,.128,false);
+  var root=THREE.SkeletonUtils.clone(gltf.scene),mh=isMH(root);dress(root,look);scene.add(root);root.position.set(0,CAN,0);root.updateMatrixWorld(true);
+  var f={root:root,mh:mh,bn:boneMap(root),mixer:new THREE.AnimationMixer(root),act:{},fx:[],saved:[],o:0,v:0,lunge:0,turn:0,drop:0,hp:100,look:look,fwd:V3(1,0,0),ph:ph,dead:false};
+  f.glv=gloves(f.bn,look.glove,root);decal(root,f.bn,'hips',look.emblem,look.emblem==='white'?.15:.12,.12,0,mh?.95:.83,mh?.137:.128,false);
   Object.keys(clips).forEach(function(k){f.act[k]=f.mixer.clipAction(clips[k]);});
   // when a move ends, drift back into the bouncing guard; knockouts stay down
   f.mixer.addEventListener('finished',function(e){if(e.action!==f.cur||KO_CLIPS[e.action.getClip().name])return;toGuard(f,.3);});
@@ -226,10 +276,10 @@ function sides(f){f.root.updateMatrixWorld(true);var R=V3().crossVectors(f.fwd,U
   return {lead:leadL?'L':'R',rear:leadL?'R':'L',Slead:R.clone().multiplyScalar(sl),Srear:R.clone().multiplyScalar(-sl)};}
 
 // where a strike lands on the opponent, and which part of the attacker touches it
-function target(D,kind,Fa){var bn=D.bn;
-  if(kind==='head')return wp(bn['head']).addScaledVector(U,.03).addScaledVector(Fa,-.1);
+function target(D,kind,Fa){var bn=D.bn,mh=D.mh; // the MakeHuman body's head joint sits higher in the skull and its hips are higher: aim at the face and upper abs
+  if(kind==='head')return wp(bn['head']).addScaledVector(U,mh?-.025:.03).addScaledVector(Fa,-.1);
   if(kind==='chest')return wp(bn['spine.003']).addScaledVector(U,-.08).addScaledVector(Fa,-.14);
-  if(kind==='belly')return wp(bn['spine.001']).addScaledVector(U,.04).addScaledVector(Fa,-.13);
+  if(kind==='belly')return wp(bn['spine.001']).addScaledVector(U,mh?.1:.04).addScaledVector(Fa,-.13);
   var s=sides(D),L=s.lead;return wp(bn['thigh.'+L]).lerp(wp(bn['shin.'+L]),.5).addScaledVector(Fa,-.08);}
 function effector(A,kind,fx){var bn=A.bn,Fa=A.fwd;
   if(kind==='glove')return (A.glv[fx.hand]||A.glv.L).getWorldPosition(V3()).addScaledVector(Fa,.085);
@@ -289,7 +339,7 @@ var MOVES={
   switch:{name:'SWITCH KICK',range:.74,clip:'mx_switch',ts:1.2,imp:.75,react:'Hit_Chest',dmg:10,push:2.6,tgt:'chest',eff:'shin',leg:'L',assist:.4,kick:1},
   knee:{name:'KNEE',range:.6,clip:'mx_knee',ts:1.15,imp:.52,react:'Hit_Chest',dmg:8,push:1.4,tgt:'belly',eff:'knee',leg:'L',assist:.35},
   head:{name:'HEAD KICK',range:1.0,clip:'mx_head',ts:1.1,imp:.55,react:'Hit_Head',dmg:14,push:3.2,tgt:'head',eff:'shin',leg:'R',assist:.65,kick:1},
-  cknee:{name:'KNEE',react:'Hit_Chest',dmg:7,push:.8,tgt:'belly',eff:'knee',leg:'R'}};
+  cknee:{name:'KNEE',react:'Hit_Chest',dmg:7,push:.8,tgt:'chest',eff:'knee',leg:'R'}};
 function rlen(m){var M=MOVES[m];return M.clip?clips[M.clip].duration/M.ts:M.dur;}
 function rimp(m){var M=MOVES[m];return M.clip?M.imp/M.ts:M.imp*M.dur;}
 function rng(s){return function(){s=(s*16807)%2147483647;return (s-1)/2147483646;};}
@@ -322,7 +372,7 @@ function strike(e){var A=F[e.a],D=F[1-e.a];
     startFx(A,'clinch',clockT,99,{t1:t1,O:D,lead:true});startFx(D,'clinch',clockT,99,{t1:t1,O:A,lead:false});
     [.55,1.4,2.15].forEach(function(dt,k){var out=k===1?'block':'hit',M=MOVES.cknee,fx={leg:'R'};
       pend.push({t:clockT+dt-.001,go:function(){label(e.a,tr('KNEE'));}});
-      CONTACTS.push({A:A,D:D,fx:fx,eff:'knee',tgt:'belly',tImp:clockT+dt,pierce:out==='block'?-.1:.01,m:'cknee'});
+      CONTACTS.push({A:A,D:D,fx:fx,eff:'knee',tgt:'chest',tImp:clockT+dt,pierce:out==='block'?-.1:.01,m:'cknee'});
       pend.push({t:clockT+dt,e:{a:e.a,m:'cknee',out:out},A:A,D:D,M:M});});return;}
   doMove(A,D,e);}
 function doMove(A,D,e){var M=MOVES[e.m],imp=rimp(e.m);PAIR.range=M.range;PAIR.rangeUntil=clockT+imp+.2;var s=sides(A),fx,side=M.side==='lead'?s.lead:s.rear,S=M.side==='lead'?s.Slead:s.Srear;
@@ -412,7 +462,7 @@ function init(gltf){
   gltf.animations.forEach(function(c){clips[c.name]=c;});
   reflashFn=build();
   F.push(makeFighter(gltf,LOOKS.a,0));F.push(makeFighter(gltf,LOOKS.b,1.7));
-  var r=THREE.SkeletonUtils.clone(gltf.scene);dress(r,LOOKS.r);scene.add(r);decal(r,boneMap(r),'spine.003','ref',.24,.24,0,1.3,-.152,true);r.position.set(1.2,CAN,-1.6);REFR={root:r,mixer:new THREE.AnimationMixer(r)};REFR.mixer.clipAction(clips.Idle_Loop).play();
+  var r=THREE.SkeletonUtils.clone(gltf.scene);dress(r,LOOKS.r);scene.add(r);var rmh=isMH(r);decal(r,boneMap(r),'spine.003','ref',rmh?.2:.24,rmh?.2:.24,0,1.3,rmh?-.096:-.152,true);r.position.set(1.2,CAN,-1.6);REFR={root:r,mixer:new THREE.AnimationMixer(r)};REFR.mixer.clipAction(clips.Idle_Loop).play();
   names();api.ready=true;}
 var fontsOk=document.fonts&&document.fonts.load?Promise.all([document.fonts.load("400 40px Anton"),document.fonts.load("700 40px 'Barlow Condensed'")]).catch(function(){}):Promise.resolve();
 // the crowned lion for the ring canvas and apron: the same art as the site's hero and footer (usually already cached). Without it the ring keeps its drawn lion.
