@@ -48,6 +48,15 @@ var camera=new THREE.PerspectiveCamera(34,1,.1,140);
 function tex(w,h,fn){var c=document.createElement('canvas');c.width=w;c.height=h;fn(c.getContext('2d'),w,h);var t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=renderer.capabilities.getMaxAnisotropy();return t;}
 var F900="400 {s}px Anton,Impact,sans-serif";function f9(s){return F900.replace('{s}',s);}
 function f7(s){return "700 "+s+"px 'Barlow Condensed','Arial Narrow',sans-serif";}
+// the gym's crowned gold lion (the site's img/lion-still.webp, 400x400, art spans x 45-358, y 0-385); set before the textures are drawn
+var LION=null,LION_TONE=.4,LION_GOLD=.5;
+// paint it centred on (cx,cy), h tall; sx squeezes it across for faces whose texture is stretched; tone darkens it like ink on canvas.
+// The arena's warm lights push its gold toward orange, so the art is first pulled a little toward yellow gold (LION_GOLD).
+function lionArt(g,cx,cy,h,sx,tone){var s=h/385,W=Math.max(1,Math.round(400*s*sx)),H=Math.max(1,Math.round(400*s)),c=document.createElement('canvas');c.width=W;c.height=H;
+  var x=c.getContext('2d');x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.drawImage(LION,0,0,W,H);
+  if(LION_GOLD)try{var d=x.getImageData(0,0,W,H),p=d.data,i,r;for(i=0;i<p.length;i+=4){r=p[i];p[i]=r*(1-.2*LION_GOLD);p[i+1]+=(r-p[i+1])*LION_GOLD;}x.putImageData(d,0,0);}catch(e){}
+  if(tone){x.globalCompositeOperation='source-atop';x.fillStyle='rgba(14,16,24,'+tone+')';x.fillRect(0,0,W,H);}
+  g.drawImage(c,cx-201.5*s*sx,cy-192.5*s);}
 // a roaring lion head in gold: a flame mane, a heavy brow, and an open mouth with fangs
 function lionHead(g,cx,cy,r,gold,dark){g.save();g.translate(cx,cy);g.lineJoin='round';
   var n=28,i,a;g.fillStyle=gold;
@@ -71,11 +80,16 @@ function wear(g,w,h,n,a){for(var i=0;i<n;i++){g.fillStyle='rgba(255,240,220,'+(M
 function canvasTop(){return tex(1024,1024,function(g,w,h){var gr=g.createRadialGradient(512,512,60,512,512,720);gr.addColorStop(0,'#1c2230');gr.addColorStop(1,'#10141d');g.fillStyle=gr;g.fillRect(0,0,w,h);
   wear(g,w,h,1400,.03);
   g.strokeStyle='#8f6a22';g.lineWidth=16;g.beginPath();g.arc(512,512,296,0,6.283);g.stroke();g.lineWidth=5;g.beginPath();g.arc(512,512,262,0,6.283);g.stroke();
-  g.globalAlpha=.85;lionHead(g,512,504,205,'#8f6a22','#171c28');g.globalAlpha=1;wear(g,w,h,500,.035);});}
+  if(LION){var gl=g.createRadialGradient(512,500,40,512,500,250);gl.addColorStop(0,'rgba(255,184,64,.16)');gl.addColorStop(1,'rgba(255,184,64,0)');g.fillStyle=gl;g.beginPath();g.arc(512,512,258,0,6.283);g.fill();
+    lionArt(g,512,506,440,1,LION_TONE);}
+  else{g.globalAlpha=.85;lionHead(g,512,504,205,'#8f6a22','#171c28');g.globalAlpha=1;}
+  wear(g,w,h,500,.035);});}
 function apron(){return tex(1024,160,function(g,w,h){g.fillStyle='#121726';g.fillRect(0,0,w,h);wear(g,w,h,300,.03);g.fillStyle='#c9962a';g.fillRect(0,0,w,5);
   g.textAlign='center';g.font=f9(88);g.fillStyle='#d9d2c4';g.fillText('LIONS ROAR',w/2,96);
   g.fillStyle='#c9962a';g.fillRect(w/2-230,118,120,3);g.fillRect(w/2+110,118,120,3);g.font=f7(30);g.fillText('M U A Y   T H A I',w/2,128);
-  lionHead(g,120,80,58,'#c9962a','#121726');lionHead(g,w-120,80,58,'#c9962a','#121726');});}
+  // the apron texture is stretched about 2x across its face, so the crowned lion is drawn squeezed to come out true
+  if(LION){lionArt(g,120,82,128,.51,.12);lionArt(g,w-120,82,128,.51,.12);}
+  else{lionHead(g,120,80,58,'#c9962a','#121726');lionHead(g,w-120,80,58,'#c9962a','#121726');}});}
 function banner(maroon){return tex(256,640,function(g,w,h){g.fillStyle=maroon?'#2e1012':'#141a2c';g.fillRect(0,0,w,h);wear(g,w,h,160,.04);g.strokeStyle='#b8872a';g.lineWidth=6;g.strokeRect(14,14,w-28,h-60);
   g.fillStyle='#c9962a';g.font=f7(30);g.textAlign='center';g.fillText('LIONS ROAR',w/2,70);lionHead(g,w/2,270,92,'#d4a232',maroon?'#2e1012':'#141a2c');
   g.font=f9(38);g.fillText('MUAY',w/2,440);g.fillText('THAI',w/2,480);
@@ -401,7 +415,10 @@ function init(gltf){
   var r=THREE.SkeletonUtils.clone(gltf.scene);dress(r,LOOKS.r);scene.add(r);decal(r,boneMap(r),'spine.003','ref',.24,.24,0,1.3,-.152,true);r.position.set(1.2,CAN,-1.6);REFR={root:r,mixer:new THREE.AnimationMixer(r)};REFR.mixer.clipAction(clips.Idle_Loop).play();
   names();api.ready=true;}
 var fontsOk=document.fonts&&document.fonts.load?Promise.all([document.fonts.load("400 40px Anton"),document.fonts.load("700 40px 'Barlow Condensed'")]).catch(function(){}):Promise.resolve();
-fetch(o.glb).then(function(r){if(!r.ok)throw new Error('glb '+r.status);return r.arrayBuffer();}).then(function(buf){return fontsOk.then(function(){return buf;});})
+// the crowned lion for the ring canvas and apron: the same art as the site's hero and footer (usually already cached). Without it the ring keeps its drawn lion.
+var lionOk=new Promise(function(res){var im=new Image();im.onload=function(){res(im.naturalWidth?im:null);};im.onerror=function(){res(null);};setTimeout(function(){res(null);},6000);im.src=o.lion||'img/lion-still.webp';})
+  .then(function(im){LION=im;});
+fetch(o.glb).then(function(r){if(!r.ok)throw new Error('glb '+r.status);return r.arrayBuffer();}).then(function(buf){return Promise.all([fontsOk,lionOk]).then(function(){return buf;});})
   .then(function(buf){new THREE.GLTFLoader().parse(buf,'',function(g){try{init(g);}catch(e){if(o.onfail)o.onfail(e);}},function(e){if(o.onfail)o.onfail(e);});})
   .catch(function(e){if(o.onfail)o.onfail(e);});
 return api;
