@@ -2,7 +2,8 @@
    The 3D fight the Find Us map zooms into. The map (index.html) loads this file on demand, together with
    three.js r147, GLTFLoader and SkeletonUtils, and drives the camera: this file only draws what the map's
    camera sees once it is close to the arena, and fades in over the map as the camera arrives.
-   Fighters: one mannequin rig with motion-captured Mixamo kicks, knees, teep, clinch and knockouts. */
+   Fighters: a rigged, textured fighter model (both corners dressed from it) with motion-captured Mixamo kicks, knees, teep, clinch
+   and knockouts carried onto its skeleton; the referee is a separate MakeHuman body. */
 (function(){
 window.LRRing={mount:function(box,o){
 var K=o.K||3.2,AX=o.AX,AY=o.AY,L=o.L||function(en){return en;},calm=false;
@@ -158,7 +159,7 @@ function cutStands(){var cx=camera.position.x,cz=camera.position.z,hd=Math.hypot
   // low ringside shots lose the ropes and posts on the camera's side, as on the map
   var low=camera.position.y<3.2&&hd>HALF+.2,dx=cx/(hd||1),dz=cz/(hd||1);ringSides.concat(ringPosts).forEach(function(e){e.o.visible=!(low&&e.n.x*dx+e.n.y*dz>.28);});}
 
-// ---------- fighters: one mannequin rig, dressed per corner by painting its vertices by body part
+// ---------- fighters: one rigged body dressed per corner (the purchased textured fighter: see texMaterial below; older untextured rigs are painted per vertex)
 var LOOKS={a:{skin:'#c68656',shorts:'#131315',trim:'#e0b030',gear:'#c01820',glove:'#c8171f',head:'#1b120c',emblem:'gold'},
            b:{skin:'#8d5436',shorts:'#131317',trim:'#ecebe6',gear:'#1f47bd',glove:'#1f47bd',head:'#0d0907',emblem:'white'},
            r:{skin:'#b78057',shirt:'#141416',pants:'#121215',head:'#2a2a2a',gloves:'#0c0c0e'}};
@@ -260,6 +261,7 @@ function leatherMaterial(col){var m=new THREE.MeshPhysicalMaterial({color:col,ro
    normal:'{float h=(lrN(vB*420.0)-.5)*.00022*lrFade(420.0)+(lrN(vB*90.0)-.5)*.0005-sm*.0009;normal=lrBump(-vViewPosition,normal,h,faceDirection);}',
    output:'outgoingLight+=lrRimFill(normalize(normal),diffuseColor.rgb,.3,.12);'});}
 function dress(root,look){root.traverse(function(o){if(!o.isSkinnedMesh)return;o.castShadow=true;o.frustumCulled=false;
+  if(o.material&&o.material.map){dressTex(o,look);return;}
   if(o.geometry.attributes._zone||o.geometry.attributes._mask){dressMH(o,look);return;}
   var g=o.geometry=o.geometry.clone(),pos=g.attributes.position,si=g.attributes.skinIndex,sw=g.attributes.skinWeight,bones=o.skeleton.bones,cols=new Float32Array(pos.count*3),c=new THREE.Color();
   for(var i=0;i<pos.count;i++){var best=0,bw=-1;for(var k=0;k<4;k++){var w=sw[GET[k]](i);if(w>bw){bw=w;best=si[GET[k]](i);}}
@@ -280,7 +282,12 @@ function dress(root,look){root.traverse(function(o){if(!o.isSkinnedMesh)return;o
     c.set(col);cols[i*3]=c.r;cols[i*3+1]=c.g;cols[i*3+2]=c.b;}
   g.setAttribute('color',new THREE.BufferAttribute(cols,3));
   o.material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:look.shirt?.8:.46,metalness:0});});}
-function boneMap(root){var m={};root.traverse(function(o){if(!o.isBone)return;var k=o.name.replace('DEF-','');m[k]=o;m[k.replace(/([a-z_])([LR])$/,'$1.$2').replace(/spine(\d+)/,'spine.$1')]=o;});return m;}
+// the purchased fighter's Unreal-style bones answer to the same names as the other rigs
+var UE_BONES={pelvis:'hips',spine_01:'spine.001',spine_02:'spine.002',spine_03:'spine.003',neck_01:'neck'};
+['l','r'].forEach(function(s){var S=s.toUpperCase();UE_BONES['clavicle_'+s]='shoulder.'+S;UE_BONES['upperarm_'+s]='upper_arm.'+S;UE_BONES['lowerarm_'+s]='forearm.'+S;UE_BONES['hand_'+s]='hand.'+S;
+  UE_BONES['thigh_'+s]='thigh.'+S;UE_BONES['calf_'+s]='shin.'+S;UE_BONES['foot_'+s]='foot.'+S;UE_BONES['ball_'+s]='toe.'+S;});
+function boneMap(root){var m={};root.traverse(function(o){if(!o.isBone)return;var k=o.name.replace('DEF-','');m[k]=o;m[k.replace(/([a-z_])([LR])$/,'$1.$2').replace(/spine(\d+)/,'spine.$1')]=o;if(UE_BONES[o.name])m[UE_BONES[o.name]]=o;});return m;}
+function isUE(root){var y=false;root.traverse(function(o){if(o.isBone&&o.name==='pelvis')y=true;});return y;}
 // on the MakeHuman body the hand bone rests unrotated, so the glove is laid along the hand itself (wrist to knuckles, found from the mesh)
 function handAxis(root,side){var dir=null;root.traverse(function(o){if(dir||!o.isSkinnedMesh||!o.geometry.attributes._zone)return;
   var g=o.geometry,pos=g.attributes.position,si=g.attributes.skinIndex,sw=g.attributes.skinWeight,sk=o.skeleton,k=-1;
@@ -302,7 +309,11 @@ function gloveGeo(){var parts=[],R=.074;
   add(new THREE.CylinderGeometry(.83,.83,.5,40,1,true),function(v){v.y-=1.7;v.multiplyScalar(R);},function(v){var d=Math.min(Math.abs(v.y/R+1.45),Math.abs(v.y/R+1.95));return 1-THREE.MathUtils.smoothstep(d,.0,.04);});
   return parts;}
 var GLOVE_GEO=null;
-function gloves(bn,col,root){var out={};['hand.L','hand.R'].forEach(function(n){var h=bn[n];if(!h)return;var s=new THREE.Vector3();h.getWorldScale(s);
+// on the purchased fighter: the front of the knuckles over the index and middle fingers, in each hand bone's own frame (measured on the model)
+var UE_KNUCKLE={L:[16.07,2.44,-.18],R:[-15.94,-2.06,.32]};
+function gloves(bn,col,root){var out={};
+  if(bn.middle_01_l){['L','R'].forEach(function(s){var m=new THREE.Object3D();m.position.fromArray(UE_KNUCKLE[s]);bn['hand.'+s].add(m);out[s]=m;});return out;}
+  ['hand.L','hand.R'].forEach(function(n){var h=bn[n];if(!h)return;var s=new THREE.Vector3();h.getWorldScale(s);
   var G=h.userData&&h.userData.glove;
   if(G){if(!GLOVE_GEO)GLOVE_GEO=gloveGeo();var mat=leatherMaterial(col),grp=new THREE.Group(),body=null;
     GLOVE_GEO.forEach(function(geo,k){var ms=new THREE.Mesh(geo,mat);ms.castShadow=true;grp.add(ms);if(!k)body=ms;});
@@ -325,6 +336,58 @@ function decalTex(kind){if(DECALS[kind])return DECALS[kind];return DECALS[kind]=
 function decal(root,bn,key,kind,w,h,x,y,z,back){var b=bn[key];if(!b)return;root.updateMatrixWorld(true);
   var m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshStandardMaterial({map:decalTex(kind),transparent:true,roughness:.6,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-4}));
   m.position.set(x,y,z);if(back)m.rotation.y=Math.PI;root.add(m);m.updateMatrixWorld(true);b.attach(m);}
+// ---------- the purchased fighter (Realistic MMA Fighter): photographed skin and hair, compression shorts, ankle supports, MMA gloves.
+// One texture set serves both corners: each fighter's colours are laid on in the shader, from masks read off the texture itself
+// (the skin tone, the glove leather, the ankle supports, the shorts' side panels), plus the gym emblem printed on the left thigh.
+// On top: the same fine skin detail, sweat sheen, subsurface warmth, cool rim and soft fill as the fighters had before.
+var TEX_SKIN=new THREE.Color('rgb(213,139,111)'); // the texture's own median skin tone
+// where the emblem sits in the shorts texture: centre, and texture offsets -> body offsets (right, up) in metres, from the model
+var EMB={uv:[.37722,.37024],A:[[-1.0292,-.0352],[.0096,1.123]],size:{gold:[.11,.11],white:[.14,.105]}};
+var EMBT={};
+function embTex(kind){if(EMBT[kind])return EMBT[kind];return EMBT[kind]=tex(256,256,function(g,w,h){
+  if(kind==='white'){g.fillStyle='#f2f0ea';g.textAlign='center';g.font=f9(78);g.fillText('MUAY',128,116);g.fillText('THAI',128,196);}
+  else if(LION)lionArt(g,128,128,236,1,0);
+  else lionHead(g,128,128,112,'#e0b030','#131315');});}
+function texMaterial(part,map,look){
+  var id={Skin:0,Legs:1,Hands:2,Shorts:3}[part];if(id===undefined)id=0;
+  var tint=new THREE.Color(look.skin);tint.r/=TEX_SKIN.r;tint.g/=TEX_SKIN.g;tint.b/=TEX_SKIN.b;
+  var U={uTint:{value:tint},uGlove:{value:new THREE.Color(look.glove)},uGear:{value:new THREE.Color(look.gear)},uTrim:{value:new THREE.Color(look.trim)}};
+  if(id===3){var sz=EMB.size[look.emblem]||EMB.size.gold,A=EMB.A,w=sz[0],h=sz[1],u0=EMB.uv[0],v0=EMB.uv[1];
+    U.uEmb={value:embTex(look.emblem)};U.uEmbM={value:new THREE.Matrix3().set(A[0][0]/w,A[0][1]/w,.5-(A[0][0]*u0+A[0][1]*v0)/w, A[1][0]/h,A[1][1]/h,.5-(A[1][0]*u0+A[1][1]*v0)/h, 0,0,1)};}
+  var m=new THREE.MeshPhysicalMaterial({map:map,roughness:.58,metalness:0,clearcoat:id===3?0:.16,clearcoatRoughness:.4});
+  if(id===3){m.sheen=1;m.sheenRoughness=.5;m.sheenColor=new THREE.Color('#3c3c44');} // compression fabric: a soft sheen at grazing angles
+  m.name=part;m.defines.LR_PART=id;
+  return lrInject(m,'lr-tex-'+id,{attr:'',body:'vB*=.0097;'},{
+   pars:'uniform vec3 uTint,uGlove,uGear,uTrim;'+(id===3?'uniform sampler2D uEmb;uniform mat3 uEmbM;':''),uniforms:U,
+   color:['vec3 c0=diffuseColor.rgb,sq=sqrt(max(c0,vec3(0.0)));',
+     'float mx=max(sq.r,max(sq.g,sq.b)),mn=min(sq.r,min(sq.g,sq.b)),sat=(mx-mn)/(mx+1e-4),lum=dot(sq,vec3(.299,.587,.114)),lin=dot(c0,vec3(.2126,.7152,.0722));',
+     'float neutral=1.0-smoothstep(.14,.24,sat),isSkin=1.0,gear=0.0,glove=0.0,panel=0.0;',
+     '#if LR_PART==1',  // the ankle supports are the dark neutral part of the legs; their pale edge stays
+     ' gear=neutral*(1.0-smoothstep(.26,.34,lum));isSkin=1.0-gear;',
+     '#elif LR_PART==2', // dark neutral leather is the glove
+     ' isSkin=smoothstep(.2,.3,sat)*smoothstep(.24,.36,lum);glove=(1.0-isSkin)*(1.0-smoothstep(.45,.6,lum));isSkin=1.0-glove;',
+     '#elif LR_PART==3', // the shorts: black, with mid-grey side panels that take the corner's trim colour
+     ' panel=neutral*smoothstep(.2,.27,lum)*(1.0-smoothstep(.55,.65,lum));isSkin=0.0;',
+     '#endif',
+     'float eyeW=0.0;',
+     '#if LR_PART==0',
+     ' eyeW=smoothstep(.58,.75,lum)*(1.0-smoothstep(.1,.18,sat));', // the whites of the eyes keep their colour
+     '#endif',
+     'vec3 c=mix(c0,c0*uTint,isSkin*(1.0-eyeW));',
+     'c=mix(c,uGear*clamp(lin/.0118,.25,3.0),gear);c=mix(c,uGlove*clamp(pow(lin/.0212,.6),.3,1.45),glove);c=mix(c,uTrim*clamp(lin/.078,.3,1.5),panel);',
+     '#if LR_PART==3',
+     ' vec2 e=(uEmbM*vec3(vUv,1.0)).xy;if(e.x>0.0&&e.x<1.0&&e.y>0.0&&e.y<1.0){vec4 em=texture2D(uEmb,e);c=mix(c,em.rgb,em.a);panel=max(panel,em.a);}',
+     '#endif',
+     'diffuseColor.rgb=c;'].join('\n'),
+   roughness:'roughnessFactor=isSkin*mix(.5,.65,lrN(vB*38.0))+glove*.5+gear*.82+panel*.5+(1.0-isSkin-glove-gear-panel)*.62;',
+   normal:'{float h=isSkin*((lrN(vB*260.0)-.5)*.00022*lrFade(260.0)+(lrN(vB*70.0+3.1)-.5)*.0005*lrFade(70.0))+glove*(lrN(vB*420.0)-.5)*.00022*lrFade(420.0)'+
+          '+gear*sin(vB.y*1500.0+lrN(vB*160.0)*2.5)*.0003*lrFade(240.0)'+(id===3?'+(lrN(vB*vec3(700.0,1400.0,700.0))-.5)*.00016*lrFade(900.0)':'')+';normal=lrBump(-vViewPosition,normal,h,faceDirection);}',
+   lights:'#ifdef USE_CLEARCOAT\nmaterial.clearcoat*=isSkin*(.25+.75*smoothstep(.45,.75,lrN(vB*8.0+2.0)))+glove*.4;\n#endif',
+   output:'{float l2=dot(outgoingLight,vec3(.299,.587,.114));vec3 alb=diffuseColor.rgb;'+
+          'outgoingLight+=alb*vec3(.5,.16,.07)*.35*isSkin*smoothstep(.0,.2,l2)*(1.0-smoothstep(.2,.8,l2));'+
+          'outgoingLight+=lrRimFill(normalize(normal),alb,.3,.26*isSkin+.12*(1.0-isSkin));}'});}
+function dressTex(o,look){var mats=Array.isArray(o.material)?o.material:[o.material];
+  var out=mats.map(function(mt){return texMaterial(mt.name,mt.map,look);});o.material=Array.isArray(o.material)?out:out[0];}
 
 var clips={},F=[],REFR=null,U=new THREE.Vector3(0,1,0);
 function V3(x,y,z){return new THREE.Vector3(x||0,y||0,z||0);}
@@ -332,11 +395,12 @@ function cb(){var v=V3();for(var i=0;i<arguments.length;i+=2)v.addScaledVector(a
 function wp(b){return b.getWorldPosition(V3());}
 function dirTo(from,to){return to.clone().sub(from).normalize();}
 var KO_CLIPS={mx_ko:1,mx_ko2:1};
-function makeFighter(gltf,look,ph){
-  var root=THREE.SkeletonUtils.clone(gltf.scene),mh=isMH(root);dress(root,look);scene.add(root);root.position.set(0,CAN,0);root.updateMatrixWorld(true);
-  var f={root:root,mh:mh,bn:boneMap(root),mixer:new THREE.AnimationMixer(root),act:{},fx:[],saved:[],o:0,v:0,lunge:0,turn:0,drop:0,hp:100,look:look,fwd:V3(1,0,0),ph:ph,dead:false};
-  f.glv=gloves(f.bn,look.glove,root);decal(root,f.bn,'hips',look.emblem,look.emblem==='white'?.15:.12,.12,0,mh?.95:.83,mh?.137:.128,false);
-  Object.keys(clips).forEach(function(k){f.act[k]=f.mixer.clipAction(clips[k]);});
+function makeFighter(src,look,ph){ // src: the fighter's part of the model file
+  var root=new THREE.Group();root.add(THREE.SkeletonUtils.clone(src));var mh=isMH(root),ue=isUE(root);dress(root,look);scene.add(root);root.position.set(0,CAN,0);root.updateMatrixWorld(true);
+  var f={root:root,mh:mh,kind:ue?'ue':mh?'mh':'mx',bn:boneMap(root),mixer:new THREE.AnimationMixer(root),act:{},fx:[],saved:[],o:0,v:0,lunge:0,turn:0,drop:0,hp:100,look:look,fwd:V3(1,0,0),ph:ph,dead:false};
+  f.glv=gloves(f.bn,look.glove,root);f.gOff=ue?0:.085; // the purchased fighter's knuckle markers sit on the glove's surface already
+  if(!ue)decal(root,f.bn,'hips',look.emblem,look.emblem==='white'?.15:.12,.12,0,mh?.95:.83,mh?.137:.128,false); // (his emblem is printed on his shorts)
+  Object.keys(clips).forEach(function(k){if(!/^Ref_/.test(k))f.act[k]=f.mixer.clipAction(clips[k]);});
   // when a move ends, drift back into the bouncing guard; knockouts stay down
   f.mixer.addEventListener('finished',function(e){if(e.action!==f.cur||KO_CLIPS[e.action.getClip().name])return;toGuard(f,.3);});
   return f;}
@@ -357,13 +421,19 @@ function sides(f){f.root.updateMatrixWorld(true);var R=V3().crossVectors(f.fwd,U
   return {lead:leadL?'L':'R',rear:leadL?'R':'L',Slead:R.clone().multiplyScalar(sl),Srear:R.clone().multiplyScalar(-sl)};}
 
 // where a strike lands on the opponent, and which part of the attacker touches it
-function target(D,kind,Fa){var bn=D.bn,mh=D.mh; // the MakeHuman body's head joint sits higher in the skull and its hips are higher: aim at the face and upper abs
-  if(kind==='head')return wp(bn['head']).addScaledVector(U,mh?-.025:.03).addScaledVector(Fa,-.1);
-  if(kind==='chest')return wp(bn['spine.003']).addScaledVector(U,-.08).addScaledVector(Fa,-.14);
-  if(kind==='belly')return wp(bn['spine.001']).addScaledVector(U,mh?.1:.04).addScaledVector(Fa,-.13);
+// per body: [up, forward] from the head joint to the face, from the upper spine joint to the chest, from the lower spine joint to the upper abs.
+// The MakeHuman head joint sits higher in the skull and its hips higher; the purchased fighter's head joint sits low at the back of the skull
+// and his spine joints higher (measured on each model: the same points on the body, a little under the skin)
+// (the purchased fighter's body targets are placed along his spine, between its lower and upper joints, so they stay on the chest when he bends)
+var TGT={mx:{head:[.03,.1],chest:[-.08,.14],belly:[.04,.13]},mh:{head:[-.025,.1],chest:[-.08,.14],belly:[.1,.13]},ue:{head:[.022,.1],chest:[.27,.09],belly:[-.08,.1],along:1}};
+function target(D,kind,Fa){var bn=D.bn,o=TGT[D.kind]||TGT.mx;
+  if(kind==='head')return wp(bn['head']).addScaledVector(U,o.head[0]).addScaledVector(Fa,-o.head[1]);
+  if(o.along&&(kind==='chest'||kind==='belly'))return wp(bn['spine.001']).lerp(wp(bn['spine.003']),o[kind][0]).addScaledVector(Fa,-o[kind][1]);
+  if(kind==='chest')return wp(bn['spine.003']).addScaledVector(U,o.chest[0]).addScaledVector(Fa,-o.chest[1]);
+  if(kind==='belly')return wp(bn['spine.001']).addScaledVector(U,o.belly[0]).addScaledVector(Fa,-o.belly[1]);
   var s=sides(D),L=s.lead;return wp(bn['thigh.'+L]).lerp(wp(bn['shin.'+L]),.5).addScaledVector(Fa,-.08);}
 function effector(A,kind,fx){var bn=A.bn,Fa=A.fwd;
-  if(kind==='glove')return (A.glv[fx.hand]||A.glv.L).getWorldPosition(V3()).addScaledVector(Fa,.085);
+  if(kind==='glove')return (A.glv[fx.hand]||A.glv.L).getWorldPosition(V3()).addScaledVector(Fa,A.gOff);
   if(kind==='shin')return wp(bn['shin.'+fx.leg]).lerp(wp(bn['foot.'+fx.leg]),.6).addScaledVector(Fa,.05);
   if(kind==='foot')return wp(bn['toe.'+fx.leg]||bn['foot.'+fx.leg]).addScaledVector(Fa,.03);
   if(kind==='knee')return wp(bn['shin.'+fx.leg]).addScaledVector(Fa,.06).addScaledVector(U,.02);
@@ -377,7 +447,8 @@ function overlay(f,now){SAVE=f.saved;var Fw=f.fwd,R=V3().crossVectors(Fw,U).norm
     if(fx.type==='clinch'){if(now>fx.t1){f.fx.splice(i,1);continue;}}else if(p>=1&&fx.type!=='win'){f.fx.splice(i,1);continue;}
     var T=fx.D?target(fx.D,fx.tgt,Fw):null,L=fx.leg,H=fx.hand,S=fx.S;
     if(fx.type==='punch'){var wc=env(p,.28,.5);f.lunge+=fx.step*wc;
-      if(T&&H&&fx.contact){var shp0=wp(bn['upper_arm.'+H]),w2=cw(now,fx.tImp)*.85;aim(bn['upper_arm.'+H],bn['forearm.'+H],dirTo(shp0,T),w2);aim(bn['forearm.'+H],bn['hand.'+H],dirTo(wp(bn['forearm.'+H]),T),w2);}}
+      // steer the arm so the striking knuckles (not just the wrist) travel toward the target
+      if(T&&H&&fx.contact){var gk=f.glv[H]||bn['hand.'+H],shp0=wp(bn['upper_arm.'+H]),w2=cw(now,fx.tImp)*.85;aim(bn['upper_arm.'+H],gk,dirTo(shp0,T),w2);aim(bn['forearm.'+H],gk,dirTo(wp(bn['forearm.'+H]),T),w2);}}
     else if(fx.type==='clip'){ // a captured kick, knee or teep: steer the striking leg onto the target around the moment of impact
       var wa=cw(now,fx.tImp)*fx.assist;f.drop+=fx.sink*wa;
       if(T&&wa>.001){var hip=wp(bn['thigh.'+L]);
@@ -385,7 +456,7 @@ function overlay(f,now){SAVE=f.saved;var Fw=f.fwd,R=V3().crossVectors(Fw,U).norm
         else{var dl=dirTo(hip,T);aim(bn['thigh.'+L],bn['shin.'+L],dl,wa);var kn=wp(bn['shin.'+L]);aim(bn['shin.'+L],bn['foot.'+L],dirTo(kn,T).lerp(dl,.5).normalize(),wa);}}}
     else if(fx.type==='hook'){var wh=env(p,.3,.56),sw=sm((p-.12)/.3);f.turn+=fx.turnSign*(-.25+.75*sw)*wh;f.lunge+=.06*wh;
       aim(bn['upper_arm.'+H],bn['forearm.'+H],cb(S,.7,Fw,.45,U,.08),wh);
-      var el=wp(bn['forearm.'+H]);aim(bn['forearm.'+H],bn['hand.'+H],T?dirTo(el,T).lerp(cb(Fw,1,S,-.2),.25).normalize():Fw,wh);
+      var el=wp(bn['forearm.'+H]);aim(bn['forearm.'+H],f.glv[H]||bn['hand.'+H],T?dirTo(el,T).lerp(cb(Fw,1,S,-.2),.25).normalize():Fw,wh);
       aim(bn['spine.002'],bn['spine.003'],cb(U,1,Fw,.12,S,-.1),wh);}
     else if(fx.type==='elbow'){var we=env(p,.32,.56),up=sm((p-.1)/.25);f.turn+=fx.turnSign*.7*we;f.lunge+=.1*we;
       var shp=wp(bn['upper_arm.'+H]);aim(bn['upper_arm.'+H],bn['forearm.'+H],T?dirTo(shp,T).addScaledVector(U,.15).addScaledVector(S,.35*(1-up)).normalize():Fw,we);
@@ -542,8 +613,10 @@ function step(rdt){
 function init(gltf){
   gltf.animations.forEach(function(c){clips[c.name]=c;});
   reflashFn=build();
-  F.push(makeFighter(gltf,LOOKS.a,0));F.push(makeFighter(gltf,LOOKS.b,1.7));
-  var r=THREE.SkeletonUtils.clone(gltf.scene);dress(r,LOOKS.r);scene.add(r);var rmh=isMH(r);decal(r,boneMap(r),'spine.003','ref',rmh?.2:.24,rmh?.2:.24,0,1.3,rmh?-.086:-.152,true);r.position.set(1.2,CAN,-1.6);REFR={root:r,mixer:new THREE.AnimationMixer(r)};REFR.mixer.clipAction(clips.Idle_Loop).play();
+  // the model file holds the fighter (both corners are dressed from it) and the referee, each under its own name
+  var fsrc=gltf.scene.getObjectByName('Fighter')||gltf.scene,rsrc=gltf.scene.getObjectByName('Referee')||fsrc;
+  F.push(makeFighter(fsrc,LOOKS.a,0));F.push(makeFighter(fsrc,LOOKS.b,1.7));
+  var r=THREE.SkeletonUtils.clone(rsrc);dress(r,LOOKS.r);scene.add(r);var rmh=isMH(r);decal(r,boneMap(r),'spine.003','ref',rmh?.2:.24,rmh?.2:.24,0,1.3,rmh?-.086:-.152,true);r.position.set(1.2,CAN,-1.6);REFR={root:r,mixer:new THREE.AnimationMixer(r)};REFR.mixer.clipAction(clips.Ref_Idle||clips.Idle_Loop).play();
   names();api.ready=true;}
 var fontsOk=document.fonts&&document.fonts.load?Promise.all([document.fonts.load("400 40px Anton"),document.fonts.load("700 40px 'Barlow Condensed'")]).catch(function(){}):Promise.resolve();
 // the crowned lion for the ring canvas and apron: the same art as the site's hero and footer (usually already cached). Without it the ring keeps its drawn lion.
