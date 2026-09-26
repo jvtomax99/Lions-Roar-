@@ -624,8 +624,9 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   .hero .shade{background:linear-gradient(180deg,rgba(11,11,11,.55) 0,rgba(11,11,11,0) 150px,rgba(11,11,11,0) calc(max(420px,62vh) + 10px),rgba(13,12,12,1) calc(max(420px,62vh) + 72px))}
   .hero .stencil{display:none}
   .hero-body{padding-top:0;margin-top:-120px}
-  /* Mobile only: keep the crowned lion the same size and move it slightly higher beside “HOME OF”. */
-  .lion{top:calc(max(420px,62vh) - 24px);right:22px;width:112px}
+  /* Mobile only: make the crowned lion a little larger and keep it beside “HOME OF”. */
+  .lion{top:calc(max(420px,62vh) - 28px);right:14px;width:124px}
+  .lion::before{content:"TAP THE LION";display:block;position:absolute;z-index:4;left:50%;top:-18px;transform:translateX(-50%);padding:4px 7px;border-radius:999px;background:rgba(11,11,11,.84);border:1px solid rgba(255,204,0,.7);color:var(--yellow);font-family:var(--cond);font-weight:700;font-size:9px;line-height:1;letter-spacing:.12em;white-space:nowrap;opacity:.9;pointer-events:none}
   .lion .fire{left:-8%;width:116%;height:122%;bottom:5%}
   .glass{position:relative;right:auto;bottom:auto;width:auto;margin:8px clamp(20px,3.6vw,56px) 0;display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px}
   .glass .cap{border:0;padding:0;margin:0}
