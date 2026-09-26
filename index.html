@@ -118,6 +118,10 @@ a{color:inherit}
 .lion{position:absolute;z-index:6;right:clamp(0px,1.6vw,28px);top:78px;width:clamp(190px,18vw,290px);aspect-ratio:1;pointer-events:auto;border:0;background:transparent;padding:0;margin:0;display:block;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;-webkit-user-select:none;overflow:visible}
 .lion:focus-visible{outline:2px solid var(--yellow);outline-offset:5px;border-radius:20px}
 .lion-hint{display:none;position:absolute;z-index:7;left:50%;top:-18px;transform:translateX(-50%);padding:4px 8px;border-radius:999px;background:rgba(11,11,11,.86);border:1px solid rgba(255,204,0,.72);color:var(--yellow);font-family:var(--cond);font-weight:700;font-size:9px;line-height:1;letter-spacing:.12em;white-space:nowrap;opacity:.92;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+.lion-roar-asset{position:absolute;z-index:8;left:50%;top:-142px;width:230px;opacity:0;pointer-events:none;transform:translate(-50%,22px) scale(.56) rotate(-4deg);transform-origin:center bottom;filter:blur(3px);will-change:transform,opacity,filter}
+.lion-roar-asset img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;filter:drop-shadow(0 3px 0 rgba(0,0,0,.92)) drop-shadow(0 0 10px rgba(255,160,0,.22))}
+.lion.roaring .lion-roar-asset{animation:lionRoarAssetPop 1.08s cubic-bezier(.16,.86,.2,1) both}
+@keyframes lionRoarAssetPop{0%{opacity:0;transform:translate(-50%,20px) scale(.52) rotate(-8deg);filter:blur(5px)}12%{opacity:1;transform:translate(-50%,-8px) scale(1.08) rotate(-5deg);filter:blur(0)}48%{opacity:1;transform:translate(-50%,-15px) scale(1.02) rotate(-4deg);filter:blur(0)}76%{opacity:.98;transform:translate(-50%,-19px) scale(1) rotate(-3deg);filter:blur(0)}100%{opacity:0;transform:translate(-50%,-34px) scale(.92) rotate(-2deg);filter:blur(2px)}}
 
 .lion-shock{position:absolute;z-index:2;left:50%;top:53%;width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,210,80,.95);box-shadow:0 0 18px rgba(255,204,0,.8),0 0 44px rgba(255,110,0,.5),inset 0 0 16px rgba(255,150,20,.35);transform:translate(-50%,-50%) scale(.15);opacity:0;pointer-events:none}
 .lion .lion-art{transform-origin:50% 58%;will-change:transform,filter}
@@ -630,6 +634,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   /* Mobile only: make the crowned lion a little larger and keep it beside “HOME OF”. */
   .lion{top:calc(max(420px,62vh) - 28px);right:14px;width:124px}
   .lion-hint{display:block}
+  .lion-roar-asset{top:-118px;width:172px;left:50%}
   .lion .fire{left:-8%;width:116%;height:122%;bottom:5%}
   .glass{position:relative;right:auto;bottom:auto;width:auto;margin:8px clamp(20px,3.6vw,56px) 0;display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px}
   .glass .cap{border:0;padding:0;margin:0}
@@ -653,6 +658,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   *,*::before,*::after{animation:none!important;transition:none!important}
   html{scroll-behavior:auto}
   .lion.roaring .lion-art{filter:drop-shadow(0 0 24px rgba(255,204,0,.95)) brightness(1.22)}
+  .lion.roaring .lion-roar-asset{opacity:1;transform:translate(-50%,-16px) scale(1) rotate(-4deg);filter:none}
   .lion.roaring .lion-shock{opacity:.65;transform:translate(-50%,-50%) scale(2.2)}
 }
 
@@ -757,7 +763,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
     <button type="button" class="menu" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="drawer"><svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><path d="M1 2H21M1 8H21M8 14H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
   </nav>
 
-  <button class="lion" id="lionBtn" type="button" aria-label="Make the Lion’s Roar mascot roar"><span class="lion-hint" aria-hidden="true">TAP THE LION</span><span class="lion-shock" aria-hidden="true"></span><canvas class="fire" id="fire" aria-hidden="true"></canvas><img class="lion-art" id="lionArt" src="img/lion-still.webp" width="400" height="400" alt="" decoding="async" fetchpriority="high"></button>
+  <button class="lion" id="lionBtn" type="button" aria-label="Make the Lion’s Roar mascot roar"><span class="lion-hint" aria-hidden="true">TAP THE LION</span><span class="lion-roar-asset" aria-hidden="true"><img src="img/lions-roar-classic-tag.webp" alt=""></span><span class="lion-shock" aria-hidden="true"></span><canvas class="fire" id="fire" aria-hidden="true"></canvas><img class="lion-art" id="lionArt" src="img/lion-still.webp" width="400" height="400" alt="" decoding="async" fetchpriority="high"></button>
 
   <div class="hero-body wrap">
     <div class="hero-copy">
