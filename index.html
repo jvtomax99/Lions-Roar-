@@ -686,7 +686,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   .hero .photo{position:relative;z-index:0;width:100%;height:62vh;min-height:420px;order:-1;background-position:62% 30%;-webkit-mask-image:none;mask-image:none}
   .hero .photo.img-hero{margin-top:var(--mobile-photo-offset);padding-top:0;-webkit-mask-image:none;mask-image:none}
   .hero .photo.img-hero img{object-fit:cover;object-position:50% 0}
-  .hero .shade{background:linear-gradient(180deg,rgba(11,11,11,.55) 0,rgba(11,11,11,0) 150px,rgba(11,11,11,0) calc(var(--mobile-photo-offset) + max(420px,62vh) + 10px),rgba(13,12,12,1) calc(var(--mobile-photo-offset) + max(420px,62vh) + 72px))}
+  .hero .shade{background:linear-gradient(180deg,transparent 0,transparent calc(var(--mobile-photo-offset) + max(420px,62vh) + 10px),rgba(13,12,12,1) calc(var(--mobile-photo-offset) + max(420px,62vh) + 72px))}
   .hero .stencil{display:none}
   .hero-body{padding-top:0;margin-top:-120px}
   /* Mobile only: make the crowned lion a little larger and keep it beside “HOME OF”. */
@@ -774,7 +774,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   .matt-play{font-size:13px}
   /* Phone hero: show the whole photo, trophies included, and start the headline just below them */
   .hero-body{margin-top:-6px}
-  .hero .photo.img-hero img{-webkit-mask-image:radial-gradient(ellipse 50% 82% at 50% 50%,#000 66%,transparent 100%),linear-gradient(180deg,transparent 0,#000 9%,#000 100%);-webkit-mask-composite:source-in;mask-image:radial-gradient(ellipse 50% 82% at 50% 50%,#000 66%,transparent 100%),linear-gradient(180deg,transparent 0,#000 9%,#000 100%);mask-composite:intersect}
+  .hero .photo.img-hero img{-webkit-mask-image:radial-gradient(ellipse 50% 82% at 50% 50%,#000 66%,transparent 100%),linear-gradient(180deg,transparent 0,#000 3%,#000 100%);-webkit-mask-composite:source-in;mask-image:radial-gradient(ellipse 50% 82% at 50% 50%,#000 66%,transparent 100%),linear-gradient(180deg,transparent 0,#000 3%,#000 100%);mask-composite:intersect}
 }
 @media (max-width:360px){.nav{gap:2px;justify-content:center}.nav .logo{width:36px;height:36px}.nav .brand{gap:4px;align-items:center;margin-right:0}.nav .brand-wordmark{width:min(46vw,calc(100vw - 186px));max-width:none;margin-right:0}.nav .lang-nav{margin-left:0}.nav .lang-nav button{min-width:29px;padding:0 3px;font-size:12px}.nav .menu{width:40px;height:40px;flex-basis:40px;margin-left:0}}
 </style>
