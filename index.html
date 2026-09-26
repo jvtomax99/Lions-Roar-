@@ -99,7 +99,7 @@ a{color:inherit}
 .hero .photo.img-hero{padding-top:72px;-webkit-mask-image:linear-gradient(90deg,transparent 30%,#000 46%,#000 84%,transparent 95%);mask-image:linear-gradient(90deg,transparent 30%,#000 46%,#000 84%,transparent 95%)}
 /* wide screens: the portrait is the centerpiece, sized to the photo and faded on both sides */
 @media (min-width:1181px){
-  .hero .photo.img-hero{top:72px;bottom:0;left:0;right:0;width:auto;padding-top:0;display:flex;justify-content:center;-webkit-mask-image:none;mask-image:none}
+  .hero .photo.img-hero{top:clamp(140px,calc(37vw - 314px),200px);bottom:0;left:0;right:0;width:auto;padding-top:0;display:flex;justify-content:center;-webkit-mask-image:none;mask-image:none}
   .hero .photo.img-hero img{width:auto;height:100%;max-width:none;object-fit:fill;-webkit-mask-image:linear-gradient(90deg,transparent 0,transparent 2%,rgba(0,0,0,.06) 7%,rgba(0,0,0,.25) 14%,rgba(0,0,0,.6) 24%,rgba(0,0,0,.9) 32%,#000 38%,#000 62%,rgba(0,0,0,.9) 68%,rgba(0,0,0,.6) 76%,rgba(0,0,0,.25) 86%,rgba(0,0,0,.06) 93%,transparent 98%,transparent 100%),linear-gradient(0deg,transparent 0,rgba(0,0,0,.3) 6%,rgba(0,0,0,.75) 12%,#000 20%);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent 0,transparent 2%,rgba(0,0,0,.06) 7%,rgba(0,0,0,.25) 14%,rgba(0,0,0,.6) 24%,rgba(0,0,0,.9) 32%,#000 38%,#000 62%,rgba(0,0,0,.9) 68%,rgba(0,0,0,.6) 76%,rgba(0,0,0,.25) 86%,rgba(0,0,0,.06) 93%,transparent 98%,transparent 100%),linear-gradient(0deg,transparent 0,rgba(0,0,0,.3) 6%,rgba(0,0,0,.75) 12%,#000 20%);mask-composite:intersect}
   .hero .shade{background:linear-gradient(90deg,#0D0C0C 0%,rgba(13,12,12,.9) 24%,rgba(13,12,12,.35) 36%,rgba(13,12,12,0) 44%,rgba(13,12,12,0) 100%),linear-gradient(180deg,rgba(11,11,11,.55) 0%,rgba(11,11,11,0) 22%,rgba(11,11,11,0) 60%,rgba(11,11,11,.92) 100%)}
 }
@@ -713,7 +713,9 @@ footer.wrap{margin-top:clamp(40px,5vw,64px)}
 .links a,.nav .btn{white-space:nowrap}
 @media (max-width:1600px){.nav .stack{display:none}}
 @media (min-width:821px) and (max-width:1180px){.fact{flex-wrap:wrap;gap:6px 16px}}
-@media (min-width:1181px) and (max-width:1440px){.nav{gap:18px}.links{gap:clamp(14px,1.6vw,26px)}.links a{letter-spacing:.1em;font-size:15px}.nav .btn{padding:0 18px;gap:10px;letter-spacing:.1em;margin-left:8px}.logo{width:80px;height:80px}.brand-lockup{width:clamp(230px,20.5vw,285px);max-width:none;max-height:none;transform:none}.nav .lang-nav{margin-left:0}}
+@media (min-width:1181px){.nav{gap:18px}.brand-lockup{width:clamp(350px,24vw,400px);max-width:none}.links{gap:clamp(18px,2vw,32px)}.nav .btn{margin-left:8px}.nav .lang-nav{margin-left:0}}
+@media (min-width:1181px) and (max-width:1440px){.links{gap:clamp(14px,1.6vw,26px)}.links a{letter-spacing:.1em;font-size:15px}.nav .btn{padding:0 18px;gap:10px;letter-spacing:.1em}.logo{width:80px;height:80px}.brand-lockup{width:clamp(230px,calc(74vw - 644px),365px)}}
+@media (min-width:821px) and (max-width:1180px){.hero .photo.img-hero{top:clamp(122px,14vw,155px);padding-top:0}}
 .drawer-top .lang-drawer{margin-left:auto;margin-right:12px}
 .drawer-top .lang button{min-height:48px;min-width:52px;font-size:16px}
 .lang-nav.nudge{animation:langNudge 1.6s ease-in-out 1.2s 2}
