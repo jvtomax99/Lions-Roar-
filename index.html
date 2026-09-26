@@ -115,21 +115,26 @@ a{color:inherit}
 .hero .tag{margin:18px 0 0;font-family:var(--body);font-weight:600;font-size:clamp(20px,1.8vw,26px)}
 .hero .lede{margin:14px 0 0;max-width:500px;font-size:17px;line-height:1.55;color:#D9D0C2}
 .hero .ctas{display:flex;gap:18px;flex-wrap:wrap;margin-top:34px}
-.lion{position:absolute;z-index:6;right:clamp(0px,1.6vw,28px);top:78px;width:clamp(190px,18vw,290px);aspect-ratio:1;pointer-events:auto;border:0;background:transparent;padding:0;margin:0;display:block;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.lion{position:absolute;z-index:6;right:clamp(0px,1.6vw,28px);top:78px;width:clamp(190px,18vw,290px);aspect-ratio:1;pointer-events:auto;border:0;background:transparent;padding:0;margin:0;display:block;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;-webkit-user-select:none;overflow:visible}
 .lion:focus-visible{outline:2px solid var(--yellow);outline-offset:5px;border-radius:20px}
-.lion::before{content:"";display:none;pointer-events:none}
-.lion::after{content:"LION’S ROAR";position:absolute;z-index:3;right:-4px;top:-10px;padding:6px 9px;background:var(--yellow);color:var(--black);font-family:var(--cond);font-weight:700;font-size:11px;line-height:1;letter-spacing:.12em;white-space:nowrap;opacity:0;transform:translateY(8px) scale(.78) rotate(-4deg);transform-origin:right center;pointer-events:none}
+.lion-hint{display:none;position:absolute;z-index:7;left:50%;top:-18px;transform:translateX(-50%);padding:4px 8px;border-radius:999px;background:rgba(11,11,11,.86);border:1px solid rgba(255,204,0,.72);color:var(--yellow);font-family:var(--cond);font-weight:700;font-size:9px;line-height:1;letter-spacing:.12em;white-space:nowrap;opacity:.92;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+.lion-roar-graphic{position:absolute;z-index:8;left:50%;top:46%;transform:translate(-50%,-50%) scale(.55);opacity:0;pointer-events:none;white-space:nowrap;font-family:var(--head);font-weight:400;font-size:clamp(30px,4.6vw,58px);line-height:.88;text-transform:uppercase;color:var(--yellow);letter-spacing:.035em;text-shadow:0 0 10px rgba(255,204,0,.65),0 0 26px rgba(255,120,0,.52),0 3px 0 rgba(0,0,0,.9)}
+.lion-shock{position:absolute;z-index:2;left:50%;top:53%;width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,210,80,.95);box-shadow:0 0 18px rgba(255,204,0,.8),0 0 44px rgba(255,110,0,.5),inset 0 0 16px rgba(255,150,20,.35);transform:translate(-50%,-50%) scale(.15);opacity:0;pointer-events:none}
 .lion .lion-art{transform-origin:50% 58%;will-change:transform,filter}
 .lion .fire{transform-origin:50% 70%;will-change:transform,filter,opacity}
-.lion.roaring .lion-art{filter:drop-shadow(0 0 26px rgba(255,204,0,.95)) brightness(1.22);animation:lionRoarPunch .8s cubic-bezier(.16,.82,.2,1)}
-.lion.roaring .fire{animation:lionFireBurst .95s ease-out}
-.lion.roaring::after{opacity:1;animation:lionRoarTag .9s cubic-bezier(.2,.8,.2,1) both}
-.lion.roaring::before{opacity:0!important;animation:none!important}
-.hero.roar-impact .hero-copy{animation:lionImpact .4s ease-out}
-@keyframes lionRoarPunch{0%{transform:scale(1)}16%{transform:scale(1.2) rotate(-3deg)}32%{transform:scale(.96) rotate(1.5deg)}50%{transform:scale(1.12) rotate(-1deg)}72%{transform:scale(1.04) rotate(.5deg)}100%{transform:scale(1) rotate(0)}}
-@keyframes lionFireBurst{0%{transform:scale(1);filter:brightness(1) saturate(1);opacity:1}18%{transform:scale(1.5);filter:brightness(2.2) saturate(1.8);opacity:1}48%{transform:scale(1.22);filter:brightness(1.55) saturate(1.35);opacity:1}100%{transform:scale(1);filter:brightness(1) saturate(1);opacity:1}}
-@keyframes lionRoarTag{0%{opacity:0;transform:translateY(10px) scale(.72) rotate(-5deg)}15%{opacity:1;transform:translateY(0) scale(1.1) rotate(-2deg)}64%{opacity:1;transform:translateY(-3px) scale(1) rotate(-2deg)}100%{opacity:0;transform:translateY(-15px) scale(.9) rotate(-2deg)}}
-@keyframes lionImpact{0%,100%{transform:translateX(0)}15%{transform:translateX(-4px)}30%{transform:translateX(4px)}48%{transform:translateX(-3px)}66%{transform:translateX(2px)}82%{transform:translateX(-1px)}}
+.lion.roaring .lion-hint{opacity:0;transform:translateX(-50%) translateY(-9px) scale(.9)}
+.lion.roaring .lion-art{filter:drop-shadow(0 0 22px rgba(255,218,92,.95)) drop-shadow(0 0 38px rgba(255,110,0,.72)) brightness(1.28);animation:lionRoarPunch .98s cubic-bezier(.16,.82,.2,1)}
+.lion.roaring .fire{animation:lionFireBurst 1.05s ease-out}
+.lion.roaring .lion-roar-graphic{animation:lionRoarGraphic 1.08s cubic-bezier(.18,.84,.2,1)}
+.lion.roaring .lion-shock{animation:lionShock 1.02s ease-out}
+.hero.roar-impact .hero-copy h1{animation:lionTitleShake .4s ease-out}
+.hero.roar-impact .hero-copy h1 .r{animation:championGlow .82s ease-out}
+@keyframes lionRoarPunch{0%{transform:scale(1) rotate(0)}13%{transform:scale(1.25) rotate(-3deg)}27%{transform:scale(.95) rotate(1.8deg)}44%{transform:scale(1.15) rotate(-1deg)}65%{transform:scale(1.06) rotate(.5deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes lionFireBurst{0%{transform:scale(1);filter:brightness(1) saturate(1);opacity:1}16%{transform:scale(1.62);filter:brightness(2.45) saturate(2);opacity:1}43%{transform:scale(1.3);filter:brightness(1.8) saturate(1.5);opacity:1}100%{transform:scale(1);filter:brightness(1) saturate(1);opacity:1}}
+@keyframes lionShock{0%{opacity:0;transform:translate(-50%,-50%) scale(.15)}12%{opacity:1;transform:translate(-50%,-50%) scale(.6)}55%{opacity:.55;transform:translate(-50%,-50%) scale(2.6)}100%{opacity:0;transform:translate(-50%,-50%) scale(3.8)}}
+@keyframes lionRoarGraphic{0%{opacity:0;transform:translate(-50%,-42%) scale(.5)}13%{opacity:1;transform:translate(-50%,-54%) scale(1.08)}58%{opacity:1;transform:translate(-50%,-62%) scale(1)}100%{opacity:0;transform:translate(-50%,-82%) scale(.9)}}
+@keyframes lionTitleShake{0%,100%{transform:translateX(0)}14%{transform:translateX(-5px)}29%{transform:translateX(5px)}46%{transform:translateX(-4px)}63%{transform:translateX(3px)}80%{transform:translateX(-2px)}}
+@keyframes championGlow{0%,100%{text-shadow:none}22%{text-shadow:0 0 10px rgba(255,204,0,.8),0 0 28px rgba(255,128,0,.55),0 0 48px rgba(255,80,0,.25)}65%{text-shadow:0 0 8px rgba(255,204,0,.5),0 0 18px rgba(255,128,0,.3)}}
 .lion .lion-art{position:relative;z-index:1;display:block;width:100%;height:100%;filter:drop-shadow(0 0 16px rgba(255,120,0,.45))}
 .lion .fire{position:absolute;z-index:0;left:-34%;width:168%;bottom:8%;height:150%;-webkit-mask-image:radial-gradient(ellipse 50% 66% at 50% 60%,#000 46%,transparent 100%),linear-gradient(0deg,transparent 0,#000 14%);-webkit-mask-composite:source-in;mask-image:radial-gradient(ellipse 50% 66% at 50% 60%,#000 46%,transparent 100%),linear-gradient(0deg,transparent 0,#000 14%);mask-composite:intersect}
 .glass{position:absolute;right:clamp(20px,3.6vw,56px);bottom:74px;width:212px;padding:22px 22px 20px;border-radius:12px;background:rgba(12,12,12,.62);border:1px solid rgba(243,235,221,.22);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
@@ -626,7 +631,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   .hero-body{padding-top:0;margin-top:-120px}
   /* Mobile only: make the crowned lion a little larger and keep it beside “HOME OF”. */
   .lion{top:calc(max(420px,62vh) - 28px);right:14px;width:124px}
-  .lion::before{content:"TAP THE LION";display:block;position:absolute;z-index:4;left:50%;top:-18px;transform:translateX(-50%);padding:4px 7px;border-radius:999px;background:rgba(11,11,11,.84);border:1px solid rgba(255,204,0,.7);color:var(--yellow);font-family:var(--cond);font-weight:700;font-size:9px;line-height:1;letter-spacing:.12em;white-space:nowrap;opacity:.9;pointer-events:none}
+  .lion-hint{display:block}
   .lion .fire{left:-8%;width:116%;height:122%;bottom:5%}
   .glass{position:relative;right:auto;bottom:auto;width:auto;margin:8px clamp(20px,3.6vw,56px) 0;display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px}
   .glass .cap{border:0;padding:0;margin:0}
@@ -646,12 +651,12 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   .slot{grid-template-columns:1fr;gap:10px}
   .final .ctas .btn{flex:1 1 100%}.final .ctas{width:100%}
 }
-@keyframes lionTapHint{0%,100%{opacity:.55;transform:translateY(0)}50%{opacity:1;transform:translateY(-2px)}}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   html{scroll-behavior:auto}
   .lion.roaring .lion-art{filter:drop-shadow(0 0 24px rgba(255,204,0,.95)) brightness(1.22)}
-  .lion.roaring::after{opacity:1;transform:none}
+  .lion.roaring .lion-roar-graphic{opacity:1;transform:translate(-50%,-58%)}
+  .lion.roaring .lion-shock{opacity:.65;transform:translate(-50%,-50%) scale(2.2)}
 }
 
 /* Team band: a full-width photo break between Champions and the yellow reviews */
@@ -755,7 +760,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
     <button type="button" class="menu" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="drawer"><svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><path d="M1 2H21M1 8H21M8 14H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
   </nav>
 
-  <button class="lion" id="lionBtn" type="button" aria-label="Make the Lion’s Roar mascot roar"><canvas class="fire" id="fire" aria-hidden="true"></canvas><img class="lion-art" id="lionArt" src="img/lion-still.webp" width="400" height="400" alt="" decoding="async" fetchpriority="high"></button>
+  <button class="lion" id="lionBtn" type="button" aria-label="Make the Lion’s Roar mascot roar"><span class="lion-hint" aria-hidden="true">TAP THE LION</span><span class="lion-roar-graphic" aria-hidden="true">LION’S ROAR</span><span class="lion-shock" aria-hidden="true"></span><canvas class="fire" id="fire" aria-hidden="true"></canvas><img class="lion-art" id="lionArt" src="img/lion-still.webp" width="400" height="400" alt="" decoding="async" fetchpriority="high"></button>
 
   <div class="hero-body wrap">
     <div class="hero-copy">
@@ -2408,14 +2413,14 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
     var hero=lionBtn.closest('.hero');
     if(hero)hero.classList.remove('roar-impact');
     void lionBtn.offsetWidth;
-    lionBoost=54;
+    lionBoost=36;
     lionBtn.classList.add('roaring');
     if(hero)hero.classList.add('roar-impact');
-    if(navigator.vibrate&&window.matchMedia('(pointer:coarse)').matches){try{navigator.vibrate(18);}catch(e){}}
+    if(navigator.vibrate&&window.matchMedia('(pointer:coarse)').matches){try{navigator.vibrate([35,30,85]);}catch(e){}}
     lionRoarTimer=setTimeout(function(){
       lionBtn.classList.remove('roaring');
       if(hero)hero.classList.remove('roar-impact');
-    },950);
+    },1150);
   }
   if(lionBtn){
     lionBtn.addEventListener('click',triggerLionRoar);
@@ -2435,7 +2440,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
     function spawn(){var u=Math.random()*2-1,edge=Math.abs(u);u*=Math.sqrt(edge)/Math.max(edge,1e-3);
       parts.push({x:W*(.5+u*.34),y:H*(.62+Math.random()*.22+edge*.08),vx:(Math.random()-.5)*.3*dpr+u*.25*dpr,vy:-(2.2+Math.random()*2.4)*(1.15-edge*.5)*H/400,
         r:(7+Math.random()*10)*(1.1-edge*.45)*W/300,life:0,max:.8+Math.random()*.9-edge*.35,ph:Math.random()*6.28,sw:.3+Math.random()*.9});}
-    function step(){var n=(lionBoost>0?30:11)+(Math.random()<.5?1:0);if(lionBoost>0)lionBoost--;for(var i=0;i<n;i++)spawn();
+    function step(){var n=(lionBoost>0?38:11)+(Math.random()<.5?1:0);if(lionBoost>0)lionBoost--;for(var i=0;i<n;i++)spawn();
       for(var j=parts.length-1;j>=0;j--){var p=parts[j];p.life+=1/60/p.max;if(p.life>=1){parts.splice(j,1);continue;}
         p.ph+=.09;p.x+=p.vx+Math.sin(p.ph)*p.sw*W/400;p.y+=p.vy;p.vy*=.997;p.vx*=.99;}}
     function draw(){fx.globalCompositeOperation='source-over';fx.clearRect(0,0,W,H);fx.globalCompositeOperation='lighter';
