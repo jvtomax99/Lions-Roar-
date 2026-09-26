@@ -41,7 +41,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;1,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;1,500&family=Black+Ops+One&family=Road+Rage&display=swap">
 <style>
 :root{
   --black:#0B0B0B;--coal:#141313;--line:rgba(243,235,221,.14);
@@ -80,10 +80,17 @@ a{color:inherit}
 
 /* ---------- NAV ---------- */
 .nav{position:absolute;z-index:10;left:0;right:0;top:0;min-height:72px;display:flex;align-items:center;gap:32px;background:rgba(8,8,8,.62);border-bottom:1px solid var(--line);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.brand{display:flex;align-items:center;gap:16px;text-decoration:none;margin-right:auto}
+.brand{display:flex;align-items:center;gap:14px;text-decoration:none;margin-right:auto;min-width:0}
 .logo{width:56px;height:56px;border-radius:50%;background:#fff;display:block;flex-shrink:0;box-shadow:0 0 0 2px rgba(11,11,11,.8),0 0 0 3px rgba(255,204,0,.7)}
-.brand b{display:block;font-family:var(--head);font-weight:400;font-size:30px;line-height:1;letter-spacing:.01em}
-.brand small{display:block;margin-top:4px;font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.2em;color:var(--yellow)}
+.brand-copy{display:flex;min-width:0;flex-direction:column;justify-content:center}
+.brand-wordmark{display:flex;align-items:flex-end;position:relative;white-space:nowrap;line-height:.78;transform:translateY(1px)}
+.brand-lions{position:relative;display:inline-block;font-family:'Black Ops One',var(--head);font-size:30px;font-weight:400;letter-spacing:-.055em;color:#F0E9DF;text-transform:uppercase;text-shadow:1px 1px 0 rgba(0,0,0,.5)}
+.brand-lions::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.28;background:repeating-linear-gradient(118deg,transparent 0 8px,rgba(11,11,11,.9) 9px 10px,transparent 11px 16px);mix-blend-mode:multiply;clip-path:polygon(0 14%,100% 4%,98% 26%,100% 43%,97% 58%,100% 78%,96% 94%,0 100%,2% 74%,0 53%,3% 31%)}
+.brand-roar{position:relative;display:inline-block;margin-left:5px;padding-right:3px;font-family:'Road Rage','Impact',sans-serif;font-size:39px;font-weight:400;line-height:.7;letter-spacing:.01em;color:#E6A91F;text-transform:uppercase;transform:translateY(2px) rotate(-1.8deg);transform-origin:left bottom;text-shadow:0 1px 0 #6B3B00,0 0 8px rgba(230,169,31,.12)}
+.brand-roar::before{content:"";position:absolute;z-index:-1;left:-5px;right:-7px;top:-4px;bottom:-5px;opacity:.48;pointer-events:none;background:radial-gradient(circle at 4% 74%,#E6A91F 0 1px,transparent 1.8px),radial-gradient(circle at 98% 26%,#E6A91F 0 1.2px,transparent 2px),radial-gradient(circle at 88% 91%,#E6A91F 0 1px,transparent 1.8px),radial-gradient(circle at 12% 14%,#E6A91F 0 .9px,transparent 1.8px)}
+.brand-roar::after{content:"";position:absolute;left:9%;right:2%;bottom:-10px;height:11px;pointer-events:none;background:linear-gradient(#E6A91F,#E6A91F) 9% 0/2px 8px no-repeat,linear-gradient(#E6A91F,#E6A91F) 29% 0/2px 5px no-repeat,linear-gradient(#E6A91F,#E6A91F) 54% 0/2px 10px no-repeat,linear-gradient(#E6A91F,#E6A91F) 76% 0/2px 6px no-repeat,linear-gradient(#E6A91F,#E6A91F) 93% 0/2px 9px no-repeat}
+.brand-crown{position:absolute;width:28px;height:20px;left:53%;top:-20px;overflow:visible;color:#E6A91F;transform:translateX(-50%) rotate(3deg);filter:drop-shadow(0 1px 0 rgba(82,43,0,.7))}
+.brand small{display:block;margin-top:8px;font-family:var(--cond);font-weight:600;font-size:11.5px;line-height:1;letter-spacing:.23em;color:#EAE2D7;white-space:nowrap;text-transform:uppercase}
 .links{display:flex;gap:clamp(24px,3.4vw,56px)}
 .links a{font-family:var(--cond);font-weight:600;font-size:16px;letter-spacing:.16em;text-decoration:none;text-transform:uppercase;padding:8px 0;border-bottom:2px solid transparent}
 .links a:hover{border-color:var(--yellow)}
@@ -708,16 +715,16 @@ footer.wrap{margin-top:clamp(40px,5vw,64px)}
 .lang button[aria-pressed="true"]{background:var(--yellow);color:var(--black)}
 .lang button:not([aria-pressed="true"]):hover{color:var(--yellow)}
 .nav .lang-nav{margin-left:clamp(12px,2vw,28px)}
-.nav .brand b,.links a,.nav .btn{white-space:nowrap}
+.brand-wordmark,.links a,.nav .btn{white-space:nowrap}
 @media (max-width:1600px){.nav .stack{display:none}}
 @media (min-width:821px) and (max-width:1180px){.fact{flex-wrap:wrap;gap:6px 16px}}
-@media (min-width:1181px) and (max-width:1440px){.nav{gap:18px}.links{gap:clamp(14px,1.6vw,26px)}.links a{letter-spacing:.1em;font-size:15px}.nav .btn{padding:0 18px;gap:10px;letter-spacing:.1em;margin-left:8px}.brand b{font-size:26px}.logo{width:48px;height:48px}.nav .lang-nav{margin-left:0}}
+@media (min-width:1181px) and (max-width:1440px){.nav{gap:18px}.links{gap:clamp(14px,1.6vw,26px)}.links a{letter-spacing:.1em;font-size:15px}.nav .btn{padding:0 18px;gap:10px;letter-spacing:.1em;margin-left:8px}.brand-lions{font-size:26px}.brand-roar{font-size:34px}.logo{width:48px;height:48px}.nav .lang-nav{margin-left:0}}
 .drawer-top .lang-drawer{margin-left:auto;margin-right:12px}
 .drawer-top .lang button{min-height:48px;min-width:52px;font-size:16px}
 .lang-nav.nudge{animation:langNudge 1.6s ease-in-out 1.2s 2}
 @keyframes langNudge{0%,100%{box-shadow:0 0 0 0 rgba(255,204,0,0)}50%{box-shadow:0 0 0 6px rgba(255,204,0,.35)}}
-@media (max-width:380px){.nav .logo{width:42px;height:42px}.nav .brand{gap:10px}.nav .brand b{font-size:23px}.nav .brand small{font-size:9.5px;letter-spacing:.12em}.nav .lang-nav button{min-width:34px}}
-@media (max-width:820px){.nav{gap:10px}.nav .brand small{white-space:nowrap;letter-spacing:.14em}.nav .lang-nav{margin-left:0}.nav .lang-nav button{min-width:38px;min-height:38px;padding:0 6px;font-size:13px;letter-spacing:.1em}}
+@media (max-width:380px){.nav .logo{width:42px;height:42px}.nav .brand{gap:8px}.nav .brand-lions{font-size:21px}.nav .brand-roar{font-size:28px;margin-left:3px}.nav .brand-crown{width:21px;height:15px;top:-15px}.nav .brand small{font-size:8.5px;letter-spacing:.11em;margin-top:6px}.nav .lang-nav button{min-width:34px}}
+@media (max-width:820px){.nav{gap:10px;min-height:78px}.nav .brand{gap:10px}.nav .logo{width:50px;height:50px}.nav .brand-lions{font-size:25px}.nav .brand-roar{font-size:33px;margin-left:4px}.nav .brand-crown{width:24px;height:17px;top:-17px}.nav .brand small{white-space:nowrap;font-size:9.5px;letter-spacing:.15em;margin-top:7px}.nav .lang-nav{margin-left:0}.nav .lang-nav button{min-width:38px;min-height:38px;padding:0 6px;font-size:13px;letter-spacing:.1em}}
 html[lang="es"] .day.today h3::after{content:" · Hoy"}
 html[lang="es"] .cls.live::after{content:"En vivo"}
 
@@ -882,7 +889,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   <svg class="grain" aria-hidden="true"><rect width="100%" height="100%" filter="url(#g)"/></svg>
 
   <nav class="nav wrap" aria-label="Main">
-    <a class="brand" href="#top"><img class="logo" src="img/crest.webp" alt="" width="56" height="56"><span><b>LION’S ROAR</b><small>MUAY THAI · BRONX NY</small></span></a>
+    <a class="brand" href="#top"><img class="logo" src="img/crest.webp" alt="" width="56" height="56"><span class="brand-copy"><span class="brand-wordmark"><span class="brand-lions">LION’S</span><span class="brand-roar">ROAR<svg class="brand-crown" viewBox="0 0 42 28" aria-hidden="true"><path d="M3 22L6 6l10 9L21 3l6 12 10-9 2 16M5 24c9-2 23-2 32 0" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span><small>MUAY THAI · BRONX NY</small></span></a>
     <div class="links"><a href="#kru">Kru William</a><a href="#champions">Champions</a><a href="#matthew">Matthew</a><a href="#film">Fight Film</a><a href="#classes">Classes</a></div>
     <a class="btn btn-red" href="#join">Start training <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M1 6H16M11 1L16 6L11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     <span class="stack" aria-hidden="true">Discipline<br>builds<br>freedom</span>
