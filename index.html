@@ -126,10 +126,10 @@ a{color:inherit}
 .lion{position:absolute;z-index:6;right:clamp(0px,1.6vw,28px);top:clamp(210px,27vh,265px);width:clamp(190px,18vw,290px);aspect-ratio:1;pointer-events:auto;border:0;background:transparent;padding:0;margin:0;display:block;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;-webkit-user-select:none;overflow:visible}
 .lion:focus-visible{outline:2px solid var(--yellow);outline-offset:5px;border-radius:20px}
 .lion-hint{display:none;position:absolute;z-index:7;left:50%;top:-18px;transform:translateX(-50%);padding:4px 8px;border-radius:999px;background:rgba(11,11,11,.86);border:1px solid rgba(255,204,0,.72);color:var(--yellow);font-family:var(--cond);font-weight:700;font-size:9px;line-height:1;letter-spacing:.12em;white-space:nowrap;opacity:.92;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
-.lion-roar-graphic{position:absolute;z-index:8;left:50%;top:38%;width:clamp(142px,16vw,230px);opacity:0;pointer-events:none;transform:translate(-50%,-100%) scale(.8) rotate(-8deg);transform-origin:center bottom;filter:drop-shadow(0 0 8px rgba(255,183,48,.48))}
+.lion-roar-graphic{position:absolute;z-index:8;left:50%;top:-124px;width:184px;opacity:0;pointer-events:none;transform:translate(-50%,8px) scale(.94) rotate(-2.4deg);transform-origin:center bottom;filter:drop-shadow(0 0 8px rgba(255,183,48,.48))}
 .lion-roar-graphic img{display:block;width:100%;height:auto}
 .lion.roaring .lion-roar-graphic{opacity:1;animation:lionRoarPop 2.8s cubic-bezier(.18,.84,.22,1) both}
-@keyframes lionRoarPop{0%{opacity:1;transform:translate(-50%,-100%) scale(.8) rotate(-8deg)}8%{opacity:1;transform:translate(-50%,-106%) scale(1.18) rotate(-5deg)}16%{opacity:1;transform:translate(-50%,-110%) scale(.97) rotate(-6deg)}82%{opacity:1;transform:translate(-50%,-112%) scale(1) rotate(-5deg)}100%{opacity:0;transform:translate(-50%,-135%) scale(.86) rotate(-4deg)}}
+@keyframes lionRoarPop{0%{opacity:1;transform:translate(-50%,8px) scale(.94) rotate(-2.4deg)}8%{opacity:1;transform:translate(-50%,-3px) scale(1.08) rotate(-2.1deg)}16%{opacity:1;transform:translate(-50%,-7px) scale(1) rotate(-1.8deg)}82%{opacity:1;transform:translate(-50%,-8px) scale(1) rotate(-1.7deg)}100%{opacity:0;transform:translate(-50%,-15px) scale(.98) rotate(-1.4deg)}}
 .lion-shock{
   position:absolute;
   z-index:2;
@@ -691,7 +691,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   /* Mobile only: make the crowned lion a little larger and keep it beside “HOME OF”. */
   .lion{top:calc(var(--mobile-photo-offset) + max(420px,62vh) - 36px);right:14px;width:124px}
   .lion-hint{display:block}
-  .lion-roar-graphic{left:44%;width:142px}
+  .lion-roar-graphic{left:50%;top:-118px;width:172px}
   .lion .fire{left:-8%;width:116%;height:122%;bottom:5%}
   .glass{position:relative;right:auto;bottom:auto;width:auto;margin:8px clamp(20px,3.6vw,56px) 0;display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px}
   .glass .cap{border:0;padding:0;margin:0}
@@ -715,7 +715,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   *,*::before,*::after{animation:none!important;transition:none!important}
   html{scroll-behavior:auto}
   .lion.roaring .lion-art{filter:drop-shadow(0 0 24px rgba(255,204,0,.95)) brightness(1.22)}
-  .lion.roaring .lion-roar-graphic{opacity:1;transform:translate(-50%,-110%) scale(1) rotate(-5deg)}
+  .lion.roaring .lion-roar-graphic{opacity:1;transform:translate(-50%,-8px) scale(1) rotate(-2deg)}
   .hero.roar-impact .hero-body{transform:none!important}
   .hero.roar-impact .hero-copy h1 .r{color:var(--yellow);background:none}
   .lion.roaring .lion-shock{opacity:.65;transform:translate(-50%,-50%) scale(2.2)}
