@@ -118,32 +118,148 @@ a{color:inherit}
 .lion{position:absolute;z-index:6;right:clamp(0px,1.6vw,28px);top:78px;width:clamp(190px,18vw,290px);aspect-ratio:1;pointer-events:auto;border:0;background:transparent;padding:0;margin:0;display:block;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;-webkit-user-select:none;overflow:visible}
 .lion:focus-visible{outline:2px solid var(--yellow);outline-offset:5px;border-radius:20px}
 .lion-hint{display:none;position:absolute;z-index:7;left:50%;top:-18px;transform:translateX(-50%);padding:4px 8px;border-radius:999px;background:rgba(11,11,11,.86);border:1px solid rgba(255,204,0,.72);color:var(--yellow);font-family:var(--cond);font-weight:700;font-size:9px;line-height:1;letter-spacing:.12em;white-space:nowrap;opacity:.92;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
-.lion-roar-asset{position:absolute;z-index:5;left:50%;top:-124px;width:184px;opacity:0;pointer-events:none;transform:translate(-50%,10px) scale(.92) rotate(-2.5deg);transform-origin:center bottom;will-change:transform,opacity}
-.lion-roar-asset::before,.lion-roar-asset::after{content:none!important;display:none!important}
-.lion-roar-asset img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;filter:none!important;backface-visibility:hidden}
-.lion.roaring .lion-roar-asset{animation:lionRoarClean 1.22s cubic-bezier(.2,.72,.22,1) both}
-@keyframes lionRoarClean{
-  0%{opacity:0;transform:translate(-50%,12px) scale(.92) rotate(-3deg)}
-  14%{opacity:1;transform:translate(-50%,-3px) scale(1.045) rotate(-2.2deg)}
-  30%{opacity:1;transform:translate(-50%,-7px) scale(1) rotate(-1.8deg)}
-  76%{opacity:1;transform:translate(-50%,-8px) scale(1) rotate(-1.8deg)}
-  100%{opacity:0;transform:translate(-50%,-16px) scale(.985) rotate(-1.4deg)}
+.lion-roar-asset{
+  position:absolute;
+  z-index:3;
+  left:50%;
+  top:-124px;
+  width:184px;
+  opacity:0;
+  pointer-events:none;
+  transform:translate(-50%,8px) scale(.94) rotate(-2.4deg);
+  transform-origin:center bottom;
+  will-change:transform,opacity
+}
+.lion-roar-asset::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:2;
+  opacity:0;
+  pointer-events:none;
+  background:linear-gradient(105deg,transparent 25%,rgba(255,221,105,0) 36%,rgba(255,232,155,.9) 47%,rgba(255,255,225,.95) 50%,rgba(255,210,80,.72) 54%,transparent 66%);
+  background-size:220% 100%;
+  background-position:120% 0;
+  -webkit-mask-image:url("img/lions-roar-classic-tag.webp");
+  -webkit-mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat;
+  -webkit-mask-position:center;
+  mask-image:url("img/lions-roar-classic-tag.webp");
+  mask-size:100% 100%;
+  mask-repeat:no-repeat;
+  mask-position:center
+}
+.lion-roar-asset::after{
+  content:"✦";
+  position:absolute;
+  z-index:4;
+  left:53%;
+  top:4%;
+  color:#FFF2B6;
+  font-size:15px;
+  line-height:1;
+  opacity:0;
+  pointer-events:none;
+  transform:translate(-50%,-50%) scale(.35) rotate(-12deg);
+  text-shadow:0 0 4px rgba(255,255,220,.85),0 0 8px rgba(255,204,65,.5)
+}
+.lion-roar-asset img{
+  display:block;
+  width:100%;
+  height:auto;
+  user-select:none;
+  -webkit-user-drag:none;
+  filter:none!important;
+  backface-visibility:hidden
+}
+.lion.roaring .lion-roar-asset{
+  animation:lionRoarPremium 1.26s cubic-bezier(.22,.72,.22,1) both
+}
+.lion.roaring .lion-roar-asset::before{
+  animation:lionGraffitiSweep .68s ease-out .12s both
+}
+.lion.roaring .lion-roar-asset::after{
+  animation:lionCrownGlint .5s cubic-bezier(.2,.8,.2,1) .2s both
+}
+@keyframes lionRoarPremium{
+  0%{opacity:0;transform:translate(-50%,8px) scale(.94) rotate(-2.8deg)}
+  13%{opacity:1;transform:translate(-50%,-3px) scale(1.035) rotate(-2.1deg)}
+  28%{opacity:1;transform:translate(-50%,-6px) scale(1) rotate(-1.8deg)}
+  76%{opacity:1;transform:translate(-50%,-8px) scale(1) rotate(-1.7deg)}
+  100%{opacity:0;transform:translate(-50%,-15px) scale(.99) rotate(-1.4deg)}
+}
+@keyframes lionGraffitiSweep{
+  0%{opacity:0;background-position:120% 0}
+  15%{opacity:.85}
+  70%{opacity:.72}
+  100%{opacity:0;background-position:-120% 0}
+}
+@keyframes lionCrownGlint{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.25) rotate(-15deg)}
+  32%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}
+  58%{opacity:.75;transform:translate(-50%,-50%) scale(.72) rotate(8deg)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(.45) rotate(14deg)}
 }
 
-.lion-shock{position:absolute;z-index:2;left:50%;top:53%;width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,210,80,.95);box-shadow:0 0 18px rgba(255,204,0,.8),0 0 44px rgba(255,110,0,.5),inset 0 0 16px rgba(255,150,20,.35);transform:translate(-50%,-50%) scale(.15);opacity:0;pointer-events:none}
+.lion-shock{
+  position:absolute;
+  z-index:2;
+  left:50%;
+  top:53%;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:3px solid rgba(255,210,80,.95);
+  transform:translate(-50%,-50%) scale(.15);
+  opacity:0;
+  pointer-events:none
+}
 .lion .lion-art{transform-origin:50% 58%;will-change:transform,filter}
 .lion .fire{transform-origin:50% 70%;will-change:transform,filter,opacity}
-.lion.roaring .lion-hint{opacity:0;transform:translateX(-50%) translateY(-9px) scale(.9)}
-.lion.roaring .lion-art{filter:drop-shadow(0 0 16px rgba(255,190,55,.58)) brightness(1.1);animation:lionRoarPunch .92s cubic-bezier(.2,.72,.22,1)}
-.lion.roaring .fire{animation:lionFireBurst 1.05s ease-out}
+.lion.roaring .lion-hint{opacity:0;transform:translateX(-50%) translateY(-7px) scale(.94)}
+.lion.roaring .lion-art{
+  filter:drop-shadow(0 0 14px rgba(255,190,55,.5)) brightness(1.08);
+  animation:lionRoarPunch .9s cubic-bezier(.2,.72,.22,1)
+}
+.lion.roaring .fire{animation:lionFireBurst 1.02s ease-out}
 .lion.roaring .lion-shock{animation:none;opacity:0}
-.hero.roar-impact .hero-copy h1{animation:lionTitleShake .4s ease-out}
-.hero.roar-impact .hero-copy h1 .r{animation:championGlow .82s ease-out}
-@keyframes lionRoarPunch{0%{transform:scale(1) rotate(0)}16%{transform:scale(1.12) rotate(-1.2deg)}34%{transform:scale(.985) rotate(.55deg)}56%{transform:scale(1.04) rotate(-.35deg)}76%{transform:scale(1.015) rotate(.15deg)}100%{transform:scale(1) rotate(0)}}
-@keyframes lionFireBurst{0%{transform:scale(1);filter:brightness(1) saturate(1);opacity:1}18%{transform:scale(1.34);filter:brightness(1.62) saturate(1.45);opacity:1}48%{transform:scale(1.16);filter:brightness(1.28) saturate(1.2);opacity:1}100%{transform:scale(1);filter:brightness(1) saturate(1);opacity:1}}
-@keyframes lionShock{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}14%{opacity:.68;transform:translate(-50%,-50%) scale(.72)}58%{opacity:.28;transform:translate(-50%,-50%) scale(2.25)}100%{opacity:0;transform:translate(-50%,-50%) scale(3)}}
-@keyframes lionTitleShake{0%,100%{transform:translateX(0)}18%{transform:translateX(-2.5px)}36%{transform:translateX(2px)}56%{transform:translateX(-1.3px)}76%{transform:translateX(.7px)}}
-@keyframes championGlow{0%,100%{text-shadow:none}24%{text-shadow:0 0 8px rgba(255,204,0,.58),0 0 20px rgba(255,128,0,.34)}66%{text-shadow:0 0 5px rgba(255,204,0,.32),0 0 12px rgba(255,128,0,.18)}}
+.hero.roar-impact .hero-body{
+  animation:lionHeroPunch .32s cubic-bezier(.22,.72,.22,1);
+  transform-origin:center center
+}
+.hero.roar-impact .hero-copy h1{animation:none}
+.hero.roar-impact .hero-copy h1 .r{
+  background-image:linear-gradient(105deg,var(--yellow) 0%,var(--yellow) 34%,#FFE97B 44%,#FFF8D4 49%,#FFD94C 55%,var(--yellow) 65%,var(--yellow) 100%);
+  background-size:240% 100%;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  animation:championLightSweep .72s ease-out both
+}
+@keyframes lionRoarPunch{
+  0%{transform:scale(1) rotate(0)}
+  18%{transform:scale(1.105) rotate(-1deg)}
+  38%{transform:scale(.99) rotate(.4deg)}
+  60%{transform:scale(1.025) rotate(-.2deg)}
+  100%{transform:scale(1) rotate(0)}
+}
+@keyframes lionFireBurst{
+  0%{transform:scale(1);filter:brightness(1) saturate(1);opacity:1}
+  18%{transform:scale(1.28);filter:brightness(1.5) saturate(1.35)}
+  46%{transform:scale(1.12);filter:brightness(1.2) saturate(1.15)}
+  68%{transform:scale(1.18);filter:brightness(1.27) saturate(1.2)}
+  100%{transform:scale(1);filter:brightness(1) saturate(1);opacity:1}
+}
+@keyframes lionHeroPunch{
+  0%,100%{transform:scale(1)}
+  34%{transform:scale(1.006)}
+  68%{transform:scale(1.002)}
+}
+@keyframes championLightSweep{
+  0%{background-position:115% 0;text-shadow:none}
+  25%{text-shadow:0 0 6px rgba(255,204,0,.25),0 0 12px rgba(255,150,20,.12)}
+  100%{background-position:-115% 0;text-shadow:none}
+}
 .lion .lion-art{position:relative;z-index:4;display:block;width:100%;height:100%;filter:drop-shadow(0 0 16px rgba(255,120,0,.45))}
 .lion .fire{position:absolute;z-index:0;left:-34%;width:168%;bottom:8%;height:150%;-webkit-mask-image:radial-gradient(ellipse 50% 66% at 50% 60%,#000 46%,transparent 100%),linear-gradient(0deg,transparent 0,#000 14%);-webkit-mask-composite:source-in;mask-image:radial-gradient(ellipse 50% 66% at 50% 60%,#000 46%,transparent 100%),linear-gradient(0deg,transparent 0,#000 14%);mask-composite:intersect}
 .glass{position:absolute;right:clamp(20px,3.6vw,56px);bottom:74px;width:212px;padding:22px 22px 20px;border-radius:12px;background:rgba(12,12,12,.62);border:1px solid rgba(243,235,221,.22);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
@@ -666,7 +782,10 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   html{scroll-behavior:auto}
   .lion.roaring .lion-art{filter:drop-shadow(0 0 24px rgba(255,204,0,.95)) brightness(1.22)}
   .lion.roaring .lion-roar-asset{opacity:1;transform:translate(-50%,-8px) scale(1) rotate(-2deg);filter:none}
+  .lion.roaring .lion-roar-asset::before,.lion.roaring .lion-roar-asset::after{display:none!important}
   .lion.roaring .lion-roar-asset img{filter:none}
+  .hero.roar-impact .hero-body{transform:none!important}
+  .hero.roar-impact .hero-copy h1 .r{color:var(--yellow);background:none}
   .lion.roaring .lion-shock{opacity:.65;transform:translate(-50%,-50%) scale(2.2)}
 }
 
@@ -2431,7 +2550,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
     lionRoarTimer=setTimeout(function(){
       lionBtn.classList.remove('roaring');
       if(hero)hero.classList.remove('roar-impact');
-    },1260);
+    },1300);
   }
   if(lionBtn){
     lionBtn.addEventListener('click',triggerLionRoar);
