@@ -118,26 +118,25 @@ a{color:inherit}
 .lion{position:absolute;z-index:6;right:clamp(0px,1.6vw,28px);top:78px;width:clamp(190px,18vw,290px);aspect-ratio:1;pointer-events:auto;border:0;background:transparent;padding:0;margin:0;display:block;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;-webkit-user-select:none;overflow:visible}
 .lion:focus-visible{outline:2px solid var(--yellow);outline-offset:5px;border-radius:20px}
 .lion-hint{display:none;position:absolute;z-index:7;left:50%;top:-18px;transform:translateX(-50%);padding:4px 8px;border-radius:999px;background:rgba(11,11,11,.86);border:1px solid rgba(255,204,0,.72);color:var(--yellow);font-family:var(--cond);font-weight:700;font-size:9px;line-height:1;letter-spacing:.12em;white-space:nowrap;opacity:.92;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
-.lion-roar-asset{position:absolute;z-index:3;left:50%;top:-124px;width:184px;opacity:0;pointer-events:none;transform:translate3d(-50%,10px,0) scale(.84) rotate(-3deg);transform-origin:center bottom;will-change:transform,opacity,filter;backface-visibility:hidden}
-.lion-roar-asset::before{content:"";position:absolute;inset:-14px -20px -10px;z-index:-2;opacity:0;border-radius:34px;background:radial-gradient(circle at 50% 56%,rgba(255,229,145,.66) 0 20%,rgba(255,181,52,.3) 34%,rgba(255,121,0,.09) 56%,transparent 74%);filter:blur(12px);transform:scale(.9)}
-.lion-roar-asset::after{content:"";position:absolute;inset:-18px -22px -14px;z-index:-1;opacity:0;background:radial-gradient(circle at 10% 30%,rgba(255,255,255,.75) 0 2px,transparent 3px),radial-gradient(circle at 20% 78%,rgba(255,193,60,.72) 0 3px,transparent 4px),radial-gradient(circle at 87% 23%,rgba(255,255,255,.62) 0 2px,transparent 3px),radial-gradient(circle at 94% 72%,rgba(255,170,30,.68) 0 3px,transparent 4px),radial-gradient(circle at 73% 88%,rgba(255,212,94,.55) 0 2px,transparent 3px)}
-.lion-roar-asset img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;backface-visibility:hidden;transform:translateZ(0);filter:drop-shadow(0 2px 0 rgba(0,0,0,.82)) drop-shadow(0 0 7px rgba(255,165,0,.16))}
-.lion.roaring .lion-roar-asset{animation:lionRoarAssetPolish 1.36s cubic-bezier(.22,.72,.22,1) both}
-.lion.roaring .lion-roar-asset::before{animation:lionRoarHaloPolish 1.36s ease-out both}
-.lion.roaring .lion-roar-asset::after{animation:lionRoarSplatterPolish 1.36s ease-out both}
-.lion.roaring .lion-roar-asset img{animation:lionRoarImagePolish 1.36s cubic-bezier(.22,.72,.22,1) both}
-@keyframes lionRoarAssetPolish{0%{opacity:0;transform:translate3d(-50%,12px,0) scale(.84) rotate(-3.5deg)}13%{opacity:1;transform:translate3d(-50%,-3px,0) scale(1.035) rotate(-2.4deg)}28%{opacity:1;transform:translate3d(-50%,-7px,0) scale(1) rotate(-2deg)}76%{opacity:1;transform:translate3d(-50%,-9px,0) scale(1) rotate(-1.8deg)}100%{opacity:0;transform:translate3d(-50%,-20px,0) scale(.985) rotate(-1.4deg)}}
-@keyframes lionRoarImagePolish{0%{opacity:.3;filter:blur(1.5px) drop-shadow(0 2px 0 rgba(0,0,0,.82)) drop-shadow(0 0 5px rgba(255,165,0,.12))}14%{opacity:1;filter:blur(0) drop-shadow(0 2px 0 rgba(0,0,0,.82)) drop-shadow(0 0 10px rgba(255,182,36,.24))}70%{opacity:1;filter:blur(0) drop-shadow(0 2px 0 rgba(0,0,0,.82)) drop-shadow(0 0 8px rgba(255,170,0,.18))}100%{opacity:.92;filter:blur(.35px) drop-shadow(0 2px 0 rgba(0,0,0,.82)) drop-shadow(0 0 6px rgba(255,160,0,.14))}}
-@keyframes lionRoarHaloPolish{0%{opacity:0;transform:scale(.9)}15%{opacity:.68;transform:scale(1.02)}38%{opacity:.3;transform:scale(1.12)}72%{opacity:.16;transform:scale(1.18)}100%{opacity:0;transform:scale(1.24)}}
-@keyframes lionRoarSplatterPolish{0%,10%{opacity:0;transform:translateY(3px) scale(.96)}22%{opacity:.55;transform:translateY(0) scale(1)}62%{opacity:.3;transform:translateY(-2px) scale(1.015)}100%{opacity:0;transform:translateY(-6px) scale(1.025)}}
+.lion-roar-asset{position:absolute;z-index:5;left:50%;top:-124px;width:184px;opacity:0;pointer-events:none;transform:translate(-50%,10px) scale(.92) rotate(-2.5deg);transform-origin:center bottom;will-change:transform,opacity}
+.lion-roar-asset::before,.lion-roar-asset::after{content:none!important;display:none!important}
+.lion-roar-asset img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;filter:none!important;backface-visibility:hidden}
+.lion.roaring .lion-roar-asset{animation:lionRoarClean 1.22s cubic-bezier(.2,.72,.22,1) both}
+@keyframes lionRoarClean{
+  0%{opacity:0;transform:translate(-50%,12px) scale(.92) rotate(-3deg)}
+  14%{opacity:1;transform:translate(-50%,-3px) scale(1.045) rotate(-2.2deg)}
+  30%{opacity:1;transform:translate(-50%,-7px) scale(1) rotate(-1.8deg)}
+  76%{opacity:1;transform:translate(-50%,-8px) scale(1) rotate(-1.8deg)}
+  100%{opacity:0;transform:translate(-50%,-16px) scale(.985) rotate(-1.4deg)}
+}
 
 .lion-shock{position:absolute;z-index:2;left:50%;top:53%;width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,210,80,.95);box-shadow:0 0 18px rgba(255,204,0,.8),0 0 44px rgba(255,110,0,.5),inset 0 0 16px rgba(255,150,20,.35);transform:translate(-50%,-50%) scale(.15);opacity:0;pointer-events:none}
 .lion .lion-art{transform-origin:50% 58%;will-change:transform,filter}
 .lion .fire{transform-origin:50% 70%;will-change:transform,filter,opacity}
 .lion.roaring .lion-hint{opacity:0;transform:translateX(-50%) translateY(-9px) scale(.9)}
-.lion.roaring .lion-art{filter:drop-shadow(0 0 22px rgba(255,218,92,.95)) drop-shadow(0 0 38px rgba(255,110,0,.72)) brightness(1.28);animation:lionRoarPunch .98s cubic-bezier(.16,.82,.2,1)}
+.lion.roaring .lion-art{filter:drop-shadow(0 0 16px rgba(255,190,55,.58)) brightness(1.1);animation:lionRoarPunch .92s cubic-bezier(.2,.72,.22,1)}
 .lion.roaring .fire{animation:lionFireBurst 1.05s ease-out}
-.lion.roaring .lion-shock{animation:lionShock 1.02s ease-out}
+.lion.roaring .lion-shock{animation:none;opacity:0}
 .hero.roar-impact .hero-copy h1{animation:lionTitleShake .4s ease-out}
 .hero.roar-impact .hero-copy h1 .r{animation:championGlow .82s ease-out}
 @keyframes lionRoarPunch{0%{transform:scale(1) rotate(0)}16%{transform:scale(1.12) rotate(-1.2deg)}34%{transform:scale(.985) rotate(.55deg)}56%{transform:scale(1.04) rotate(-.35deg)}76%{transform:scale(1.015) rotate(.15deg)}100%{transform:scale(1) rotate(0)}}
@@ -666,8 +665,8 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   *,*::before,*::after{animation:none!important;transition:none!important}
   html{scroll-behavior:auto}
   .lion.roaring .lion-art{filter:drop-shadow(0 0 24px rgba(255,204,0,.95)) brightness(1.22)}
-  .lion.roaring .lion-roar-asset{opacity:1;transform:translate(-50%,-16px) scale(1) rotate(-4deg);filter:none}
-  .lion.roaring .lion-roar-asset img{clip-path:inset(0 0 0 0);filter:none}
+  .lion.roaring .lion-roar-asset{opacity:1;transform:translate(-50%,-8px) scale(1) rotate(-2deg);filter:none}
+  .lion.roaring .lion-roar-asset img{filter:none}
   .lion.roaring .lion-shock{opacity:.65;transform:translate(-50%,-50%) scale(2.2)}
 }
 
@@ -2432,7 +2431,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
     lionRoarTimer=setTimeout(function(){
       lionBtn.classList.remove('roaring');
       if(hero)hero.classList.remove('roar-impact');
-    },1400);
+    },1260);
   }
   if(lionBtn){
     lionBtn.addEventListener('click',triggerLionRoar);
