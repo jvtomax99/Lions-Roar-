@@ -115,7 +115,19 @@ a{color:inherit}
 .hero .tag{margin:18px 0 0;font-family:var(--body);font-weight:600;font-size:clamp(20px,1.8vw,26px)}
 .hero .lede{margin:14px 0 0;max-width:500px;font-size:17px;line-height:1.55;color:#D9D0C2}
 .hero .ctas{display:flex;gap:18px;flex-wrap:wrap;margin-top:34px}
-.lion{position:absolute;z-index:0;right:clamp(0px,1.6vw,28px);top:78px;width:clamp(190px,18vw,290px);aspect-ratio:1;pointer-events:none}
+.lion{position:absolute;z-index:0;right:clamp(0px,1.6vw,28px);top:78px;width:clamp(190px,18vw,290px);aspect-ratio:1;pointer-events:auto;border:0;background:transparent;padding:0;margin:0;display:block;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.lion:focus-visible{outline:2px solid var(--yellow);outline-offset:5px;border-radius:20px}
+.lion::after{content:"LION’S ROAR";position:absolute;z-index:3;right:-4px;top:-10px;padding:5px 8px;background:var(--yellow);color:var(--black);font-family:var(--cond);font-weight:700;font-size:11px;line-height:1;letter-spacing:.12em;white-space:nowrap;opacity:0;transform:translateY(8px) scale(.78) rotate(-4deg);transform-origin:right center;pointer-events:none}
+.lion .lion-art{transform-origin:50% 58%;will-change:transform,filter}
+.lion .fire{transform-origin:50% 70%;will-change:transform,filter,opacity}
+.lion.roaring .lion-art{animation:lionRoarPunch .72s cubic-bezier(.2,.8,.2,1)}
+.lion.roaring .fire{animation:lionFireBurst .9s ease-out}
+.lion.roaring::after{animation:lionRoarTag .85s cubic-bezier(.2,.8,.2,1)}
+.hero.roar-impact .hero-body{animation:lionImpact .34s ease-out}
+@keyframes lionRoarPunch{0%{transform:scale(1)}18%{transform:scale(1.13) rotate(-2deg)}34%{transform:scale(.98) rotate(1deg)}52%{transform:scale(1.08) rotate(-.7deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes lionFireBurst{0%{transform:scale(1);filter:brightness(1) saturate(1);opacity:1}20%{transform:scale(1.28);filter:brightness(1.75) saturate(1.45);opacity:1}55%{transform:scale(1.12);filter:brightness(1.35) saturate(1.2);opacity:1}100%{transform:scale(1);filter:brightness(1) saturate(1);opacity:1}}
+@keyframes lionRoarTag{0%{opacity:0;transform:translateY(8px) scale(.78) rotate(-4deg)}18%{opacity:1;transform:translateY(0) scale(1.05) rotate(-2deg)}65%{opacity:1;transform:translateY(-2px) scale(1) rotate(-2deg)}100%{opacity:0;transform:translateY(-12px) scale(.92) rotate(-2deg)}}
+@keyframes lionImpact{0%,100%{transform:translateX(0)}20%{transform:translateX(-2px)}40%{transform:translateX(2px)}60%{transform:translateX(-1px)}80%{transform:translateX(1px)}}
 .lion .lion-art{position:relative;z-index:1;display:block;width:100%;height:100%;filter:drop-shadow(0 0 16px rgba(255,120,0,.45))}
 .lion .fire{position:absolute;z-index:0;left:-34%;width:168%;bottom:8%;height:150%;-webkit-mask-image:radial-gradient(ellipse 50% 66% at 50% 60%,#000 46%,transparent 100%),linear-gradient(0deg,transparent 0,#000 14%);-webkit-mask-composite:source-in;mask-image:radial-gradient(ellipse 50% 66% at 50% 60%,#000 46%,transparent 100%),linear-gradient(0deg,transparent 0,#000 14%);mask-composite:intersect}
 .glass{position:absolute;right:clamp(20px,3.6vw,56px);bottom:74px;width:212px;padding:22px 22px 20px;border-radius:12px;background:rgba(12,12,12,.62);border:1px solid rgba(243,235,221,.22);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
@@ -734,7 +746,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
     <button type="button" class="menu" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="drawer"><svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><path d="M1 2H21M1 8H21M8 14H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
   </nav>
 
-  <div class="lion" aria-hidden="true"><canvas class="fire" id="fire"></canvas><img class="lion-art" id="lionArt" src="img/lion-still.webp" width="400" height="400" alt="" decoding="async" fetchpriority="high"></div>
+  <button class="lion" id="lionBtn" type="button" aria-label="Make the Lion’s Roar mascot roar"><canvas class="fire" id="fire" aria-hidden="true"></canvas><img class="lion-art" id="lionArt" src="img/lion-still.webp" width="400" height="400" alt="" decoding="async" fetchpriority="high"></button>
 
   <div class="hero-body wrap">
     <div class="hero-copy">
@@ -2377,6 +2389,29 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   function lionLater(){if(window.requestIdleCallback)requestIdleCallback(lionAnim,{timeout:2500});else setTimeout(lionAnim,1200);}
   if(!calm&&!slow){if(document.readyState==='complete'){lionLater();}else{window.addEventListener('load',lionLater);}}
 
+  // Tap/click the mascot: punch the lion forward, flare the fire and give the hero a tiny impact shake.
+  // Sound stays off by default so the page never surprises visitors.
+  var lionBtn=$('lionBtn'),lionBoost=0,lionRoarTimer=0;
+  function triggerLionRoar(){
+    if(!lionBtn||calm)return;
+    clearTimeout(lionRoarTimer);
+    lionBtn.classList.remove('roaring');
+    var hero=lionBtn.closest('.hero');
+    if(hero)hero.classList.remove('roar-impact');
+    void lionBtn.offsetWidth;
+    lionBoost=54;
+    lionBtn.classList.add('roaring');
+    if(hero)hero.classList.add('roar-impact');
+    if(navigator.vibrate&&window.matchMedia('(pointer:coarse)').matches){try{navigator.vibrate(18);}catch(e){}}
+    lionRoarTimer=setTimeout(function(){
+      lionBtn.classList.remove('roaring');
+      if(hero)hero.classList.remove('roar-impact');
+    },950);
+  }
+  if(lionBtn){
+    lionBtn.addEventListener('click',triggerLionRoar);
+  }
+
   // Wild fire behind the lion: soft glowing embers rise, sway and cool from white-yellow to red,
   // blended additively so overlaps build into flame tongues. Drawn at full screen sharpness;
   // pauses off screen or in a background tab; a single still frame with reduced motion.
@@ -2391,7 +2426,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
     function spawn(){var u=Math.random()*2-1,edge=Math.abs(u);u*=Math.sqrt(edge)/Math.max(edge,1e-3);
       parts.push({x:W*(.5+u*.34),y:H*(.62+Math.random()*.22+edge*.08),vx:(Math.random()-.5)*.3*dpr+u*.25*dpr,vy:-(2.2+Math.random()*2.4)*(1.15-edge*.5)*H/400,
         r:(7+Math.random()*10)*(1.1-edge*.45)*W/300,life:0,max:.8+Math.random()*.9-edge*.35,ph:Math.random()*6.28,sw:.3+Math.random()*.9});}
-    function step(){var n=11+(Math.random()<.5?1:0);for(var i=0;i<n;i++)spawn();
+    function step(){var n=(lionBoost>0?30:11)+(Math.random()<.5?1:0);if(lionBoost>0)lionBoost--;for(var i=0;i<n;i++)spawn();
       for(var j=parts.length-1;j>=0;j--){var p=parts[j];p.life+=1/60/p.max;if(p.life>=1){parts.splice(j,1);continue;}
         p.ph+=.09;p.x+=p.vx+Math.sin(p.ph)*p.sw*W/400;p.y+=p.vy;p.vy*=.997;p.vx*=.99;}}
     function draw(){fx.globalCompositeOperation='source-over';fx.clearRect(0,0,W,H);fx.globalCompositeOperation='lighter';
