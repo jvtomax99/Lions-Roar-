@@ -132,13 +132,14 @@ a{color:inherit}
 @keyframes lionRoarPop{0%{opacity:1;transform:translate(-50%,8px) scale(.94) rotate(-2.4deg)}8%{opacity:1;transform:translate(-50%,-3px) scale(1.08) rotate(-2.1deg)}16%{opacity:1;transform:translate(-50%,-7px) scale(1) rotate(-1.8deg)}82%{opacity:1;transform:translate(-50%,-8px) scale(1) rotate(-1.7deg)}100%{opacity:0;transform:translate(-50%,-15px) scale(.98) rotate(-1.4deg)}}
 .lion-shock{
   position:absolute;
-  z-index:2;
+  z-index:5;
   left:50%;
-  top:53%;
-  width:40px;
-  height:40px;
+  top:66%;
+  width:clamp(40px,4vw,52px);
+  height:clamp(40px,4vw,52px);
   border-radius:50%;
-  border:3px solid rgba(255,210,80,.95);
+  border:3px solid rgba(255,225,120,.95);
+  box-shadow:0 0 14px rgba(255,204,0,.75),inset 0 0 8px rgba(255,204,0,.5);
   transform:translate(-50%,-50%) scale(.15);
   opacity:0;
   pointer-events:none
@@ -151,8 +152,8 @@ a{color:inherit}
   animation:lionRoarPunch .9s cubic-bezier(.2,.72,.22,1)
 }
 .lion.roaring .fire{animation:lionFireBurst 1.02s ease-out}
-.lion.roaring .lion-shock{animation:lionShock 1s ease-out both}
-@keyframes lionShock{0%{opacity:0;transform:translate(-50%,-50%) scale(.15)}15%{opacity:.9;transform:translate(-50%,-50%) scale(.7)}100%{opacity:0;transform:translate(-50%,-50%) scale(3.8)}}
+.lion.roaring .lion-shock{animation:lionShock 1.25s ease-out .4s both}
+@keyframes lionShock{0%{opacity:.3;transform:translate(-50%,-50%) scale(.15)}15%{opacity:1;transform:translate(-50%,-50%) scale(.7)}55%{opacity:.65;transform:translate(-50%,-50%) scale(4.4)}100%{opacity:0;transform:translate(-50%,-50%) scale(7.5)}}
 .hero.roar-impact .hero-body{
   animation:lionHeroPunch .32s cubic-bezier(.22,.72,.22,1);
   transform-origin:center center
@@ -718,7 +719,7 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
   .lion.roaring .lion-roar-graphic{opacity:1;transform:translate(-50%,-8px) scale(1) rotate(-2deg)}
   .hero.roar-impact .hero-body{transform:none!important}
   .hero.roar-impact .hero-copy h1 .r{color:var(--yellow);background:none}
-  .lion.roaring .lion-shock{opacity:.65;transform:translate(-50%,-50%) scale(2.2)}
+  .lion.roaring .lion-shock{opacity:.55;transform:translate(-50%,-50%) scale(5.5)}
 }
 
 /* Team band: a full-width photo break between Champions and the yellow reviews */
@@ -2467,14 +2468,20 @@ html[lang="es"] .cls.live::after{content:"En vivo"}
 
   // Tap/click the mascot: punch the lion forward, flare the fire and give the hero a tiny impact shake.
   // Sound stays off by default so the page never surprises visitors.
-  var lionBtn=$('lionBtn'),lionBoost=0,lionRoarTimer=0;
+  var lionBtn=$('lionBtn'),lionBoost=0,lionRoarTimer=0,lionReplayFrame=0;
   function triggerLionRoar(){
     if(!lionBtn)return;
     clearTimeout(lionRoarTimer);
+    cancelAnimationFrame(lionReplayFrame);
     lionBtn.classList.remove('roaring');
     var hero=lionBtn.closest('.hero');
     if(hero)hero.classList.remove('roar-impact');
     void lionBtn.offsetWidth;
+    if(!calm){
+      var lionArt=$('lionArt');
+      lionArt.src='img/lion-still.webp';
+      lionReplayFrame=requestAnimationFrame(function(){lionArt.src='img/lion-anim.webp';});
+    }
     lionBoost=24;
     lionBtn.classList.add('roaring');
     if(hero)hero.classList.add('roar-impact');
