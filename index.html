@@ -856,7 +856,7 @@ html[lang="es"] .hero h1{background-image:url(img/casa-de-campeones-graffiti.web
     <button type="button" class="menu" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="drawer"><svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true"><path d="M1 2H21M1 8H21M8 14H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
   </nav>
 
-  <button class="lion" id="lionBtn" type="button" aria-label="Make the Lion’s Roar mascot roar"><span class="lion-hint" aria-hidden="true">TAP THE LION</span><span class="lion-roar-graphic" aria-hidden="true"><img src="img/lions-roar-classic-tag.webp" alt=""></span><span class="lion-shock" aria-hidden="true"></span><canvas class="fire" id="fire" aria-hidden="true"></canvas><img class="lion-art" id="lionArt" src="img/lion-still.webp?v=furious1" width="400" height="400" alt="" decoding="async" fetchpriority="high"></button>
+  <button class="lion" id="lionBtn" type="button" aria-label="Make the Lion’s Roar mascot roar"><span class="lion-hint" aria-hidden="true">TAP THE LION</span><span class="lion-roar-graphic" aria-hidden="true"><img src="img/lions-roar-classic-tag.webp" alt=""></span><span class="lion-shock" aria-hidden="true"></span><canvas class="fire" id="fire" aria-hidden="true"></canvas><img class="lion-art" id="lionArt" src="img/lion-still.webp?v=furious2" width="400" height="400" alt="" decoding="async" fetchpriority="high"></button>
 
   <div class="hero-body wrap">
     <div class="hero-copy">
@@ -1158,7 +1158,7 @@ html[lang="es"] .hero h1{background-image:url(img/casa-de-campeones-graffiti.web
 </section>
 
 <div class="foot-mark wrap">
-  <img src="img/lion-still.webp?v=furious1" width="400" height="400" alt="" loading="lazy" decoding="async">
+  <img src="img/lion-still.webp?v=furious2" width="400" height="400" alt="" loading="lazy" decoding="async">
   <span class="word" aria-hidden="true">Lion’s Roar</span>
   <span class="tag">Home of champions · Bronx, NY · Since 1990</span>
   <a class="ig" href="https://www.instagram.com/lionsroarnyc/" target="_blank" rel="noopener">Follow @lionsroarnyc <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M1 6H16M11 1L16 6L11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
@@ -2494,7 +2494,7 @@ html[lang="es"] .hero h1{background-image:url(img/casa-de-campeones-graffiti.web
 
   // Hero lion: preload the full facial roar after the page is ready, then play it when the mascot is tapped.
   // Keep the closed-mouth still visible between roars so the expression has a clear build and release.
-  function lionAnim(){var a=new Image();a.src='img/lion-anim.webp?v=furious1';}
+  function lionAnim(){var a=new Image();a.src='img/lion-anim.webp?v=furious2';}
   var net=navigator.connection,slow=net&&/(^|-)2g|3g/.test(net.effectiveType||'');
   function lionLater(){if(window.requestIdleCallback)requestIdleCallback(lionAnim,{timeout:2500});else setTimeout(lionAnim,1200);}
   if(!calm&&!slow){if(document.readyState==='complete'){lionLater();}else{window.addEventListener('load',lionLater);}}
@@ -2512,8 +2512,8 @@ html[lang="es"] .hero h1{background-image:url(img/casa-de-campeones-graffiti.web
     void lionBtn.offsetWidth;
     if(!calm){
       var lionArt=$('lionArt');
-      lionArt.src='img/lion-still.webp?v=furious1';
-      lionReplayFrame=requestAnimationFrame(function(){lionArt.src='img/lion-anim.webp?v=furious1';});
+      lionArt.src='img/lion-still.webp?v=furious2';
+      lionReplayFrame=requestAnimationFrame(function(){lionArt.src='img/lion-anim.webp?v=furious2';});
     }
     lionBoost=24;
     lionBtn.classList.add('roaring');
