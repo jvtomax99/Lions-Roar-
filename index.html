@@ -2492,9 +2492,9 @@ html[lang="es"] .hero h1{background-image:url(img/casa-de-campeones-graffiti.web
     var es=document.documentElement.lang==='es',msg=es?'¡Hola! Quisiera reservar mi primera clase en Lion’s Roar.':'Hi! I’d like to book my first class at Lion’s Roar.';
     a.href='sms:+13479281764?&body='+encodeURIComponent(msg);});});
 
-  // Hero lion: a still first, the animated cut-out swapped in once the page has loaded and the browser is idle
-  // (never with reduced motion, data saver or a 2G/3G connection)
-  function lionAnim(){var a=new Image();a.onload=function(){$('lionArt').src=a.src;};a.src='img/lion-anim.webp';}
+  // Hero lion: preload the full facial roar after the page is ready, then play it when the mascot is tapped.
+  // Keep the closed-mouth still visible between roars so the expression has a clear build and release.
+  function lionAnim(){var a=new Image();a.src='img/lion-anim.webp';}
   var net=navigator.connection,slow=net&&/(^|-)2g|3g/.test(net.effectiveType||'');
   function lionLater(){if(window.requestIdleCallback)requestIdleCallback(lionAnim,{timeout:2500});else setTimeout(lionAnim,1200);}
   if(!calm&&!slow){if(document.readyState==='complete'){lionLater();}else{window.addEventListener('load',lionLater);}}
@@ -2522,7 +2522,7 @@ html[lang="es"] .hero h1{background-image:url(img/casa-de-campeones-graffiti.web
     lionRoarTimer=setTimeout(function(){
       lionBtn.classList.remove('roaring');
       if(hero)hero.classList.remove('roar-impact');
-    },3000);
+    },4200);
   }
   if(lionBtn){
     lionBtn.addEventListener('click',triggerLionRoar);
