@@ -2494,7 +2494,7 @@ html[lang="es"] .hero h1{background-image:url(img/casa-de-campeones-graffiti.web
 
   // Hero lion: preload the full facial roar after the page is ready, then play it when the mascot is tapped.
   // Keep the closed-mouth still visible between roars so the expression has a clear build and release.
-  function lionAnim(){var a=new Image();a.src='img/lion-anim.webp?v=furious2';}
+  function lionAnim(){var a=new Image();a.src='img/lion-anim.gif?v=furious3';}
   var net=navigator.connection,slow=net&&/(^|-)2g|3g/.test(net.effectiveType||'');
   function lionLater(){if(window.requestIdleCallback)requestIdleCallback(lionAnim,{timeout:2500});else setTimeout(lionAnim,1200);}
   if(!calm&&!slow){if(document.readyState==='complete'){lionLater();}else{window.addEventListener('load',lionLater);}}
@@ -2513,7 +2513,7 @@ html[lang="es"] .hero h1{background-image:url(img/casa-de-campeones-graffiti.web
     if(!calm){
       var lionArt=$('lionArt');
       lionArt.src='img/lion-still.webp?v=furious2';
-      lionReplayFrame=requestAnimationFrame(function(){lionArt.src='img/lion-anim.webp?v=furious2';});
+      lionReplayFrame=requestAnimationFrame(function(){lionArt.src='img/lion-anim.gif?v=furious3';});
     }
     lionBoost=24;
     lionBtn.classList.add('roaring');
